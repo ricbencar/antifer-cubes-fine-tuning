@@ -16,7 +16,7 @@
   - SI units are used internally; exported coordinates are in metres.
   - The physical bottom datum is z = 0.
   - X and Y exported coordinates are shifted to the homogeneous centre of mass.
-  - Groove sampling is fixed to 144 arc points to remain aligned with script.py.
+  - Groove sampling is fixed to 144 arc points for deterministic OBJ/STL triangulation.
 -->
 <html lang="en">
 <head>
@@ -33,9 +33,6 @@
       --muted: #9ca3af;
       --accent: #60a5fa;
       --accent2: #93c5fd;
-      --ok: #22c55e;
-      --warn: #f59e0b;
-      --bad: #ef4444;
       --field: #020617;
       --mono: Consolas, "SFMono-Regular", Menlo, Monaco, monospace;
       --sans: "Segoe UI", Roboto, Arial, sans-serif;
@@ -54,8 +51,8 @@
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .field { display: flex; flex-direction: column; gap: 6px; }
     label { color: var(--muted); font-size: 14px; }
-    input[type="number"], select, textarea { width: 100%; background: var(--field); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; font: 15px var(--sans); outline: none; }
-    input[type="number"]:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(96,165,250,0.18); }
+    input[type="number"] { width: 100%; background: var(--field); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; font: 15px var(--sans); outline: none; }
+    input[type="number"]:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(96,165,250,0.18); }
     .radios { display: flex; flex-direction: column; gap: 10px; margin: 8px 0 14px; }
     .radio-card { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: rgba(2,6,23,0.45); cursor: pointer; }
     .radio-card strong { display: block; margin-bottom: 3px; font-size: 15px; }
@@ -95,7 +92,6 @@
     .drawing-card canvas { width: 100%; height: 300px; display: block; background: #0b1224; border: 1px solid rgba(147,197,253,0.35); border-radius: 7px; }
     .drawing-note { margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.42; }
     .footer-note { padding: 0 16px 16px; color: var(--muted); font-size: 13px; line-height: 1.48; }
-    a { color: var(--accent2); }
   </style>
 </head>
 <body>
@@ -112,7 +108,7 @@
   <section class="panel">
     <h2>Inputs</h2>
     <div class="body">
-      <div class="radios" id="profileRadios">
+      <div class="radios">
         <label class="radio-card">
           <input type="radio" name="profile" value="pita_1986" checked />
           <span><strong>Pita (1986)</strong>Historical proportional convention for an Antifer unit defined by tapered square sections, lateral chamfers and four circular side grooves.</span>
@@ -133,7 +129,7 @@
           <input id="unitWeight" type="number" min="0.000001" step="0.001" value="27.2" />
         </div>
         <div class="field">
-          <label for="arcPoints">Groove arc points (script.py)</label>
+          <label for="arcPoints">Groove arc points</label>
           <input id="arcPoints" type="number" min="144" max="144" step="1" value="144" readonly />
         </div>
         <div class="field">
@@ -210,6 +206,7 @@
 </section>
 
 <script>
+(() => {
 "use strict";
 
 /* ============================================================
@@ -217,8 +214,8 @@
 
    These constants define the two supported Antifer profiles. Geometry is
    generated analytically from coefficients; no hidden template mesh is used.
-   Keep DEFAULT_GROOVE_ARC_POINTS fixed at 144 when parity with script.py is
-   required for OBJ/STL triangulation.
+   Keep DEFAULT_GROOVE_ARC_POINTS fixed at 144 for deterministic OBJ/STL
+   triangulation and reproducible validation metrics.
    ============================================================ */
 
 const STANDARD_GRAVITY_M_S2 = 9.80665;
@@ -229,7 +226,6 @@ const PITA_HISTORICAL_VOLUME_COEFFICIENT = 1.024700000000;
 const PITA_COMMON_DIMENSION_FACTOR = 1.000000;
 const PITA_BOTTOM_WIDTH_COEFFICIENT = 1.086000;
 const PITA_TOP_WIDTH_COEFFICIENT = 1.005000;
-const PITA_HISTORICAL_GROOVE_DIMENSION_COEFFICIENT = 0.09559354039013697;
 const PITA_EDGE_CHAMFER_COEFFICIENT = 0.024000;
 const PITA_GROOVE_RADIUS_COEFFICIENT = 0.121500000000;
 const PITA_GROOVE_CENTRE_OFFSET_COEFFICIENT = 0.025906459609863028;
@@ -248,7 +244,6 @@ const GEOMETRY_PROFILES = {
     commonDimensionFactor: PITA_COMMON_DIMENSION_FACTOR,
     bottomWidthCoefficient: PITA_BOTTOM_WIDTH_COEFFICIENT,
     topWidthCoefficient: PITA_TOP_WIDTH_COEFFICIENT,
-    historicalGrooveDimensionCoefficient: PITA_HISTORICAL_GROOVE_DIMENSION_COEFFICIENT,
     grooveDimensionCoefficient: PITA_GROOVE_DIMENSION_COEFFICIENT,
     edgeChamferCoefficient: PITA_EDGE_CHAMFER_COEFFICIENT,
     grooveRadiusCoefficient: PITA_GROOVE_RADIUS_COEFFICIENT,
@@ -262,7 +257,6 @@ const GEOMETRY_PROFILES = {
     commonDimensionFactor: CARVALHO_COMMON_DIMENSION_FACTOR,
     bottomWidthCoefficient: PITA_BOTTOM_WIDTH_COEFFICIENT * CARVALHO_COMMON_DIMENSION_FACTOR,
     topWidthCoefficient: PITA_TOP_WIDTH_COEFFICIENT * CARVALHO_COMMON_DIMENSION_FACTOR,
-    historicalGrooveDimensionCoefficient: PITA_HISTORICAL_GROOVE_DIMENSION_COEFFICIENT * CARVALHO_COMMON_DIMENSION_FACTOR,
     grooveDimensionCoefficient: PITA_GROOVE_DIMENSION_COEFFICIENT * CARVALHO_COMMON_DIMENSION_FACTOR,
     edgeChamferCoefficient: PITA_EDGE_CHAMFER_COEFFICIENT * CARVALHO_COMMON_DIMENSION_FACTOR,
     grooveRadiusCoefficient: PITA_GROOVE_RADIUS_COEFFICIENT * CARVALHO_COMMON_DIMENSION_FACTOR,
@@ -271,7 +265,6 @@ const GEOMETRY_PROFILES = {
 };
 
 let activeBrep = null;
-let activeMetrics = null;
 let activeReport = "";
 const unitVolumeCache = new Map();
 
@@ -279,7 +272,7 @@ const unitVolumeCache = new Map();
    Generic utilities
 
    The application intentionally uses browser-standard APIs only: DOM, Canvas
-   2D, Blob downloads and Clipboard API with a legacy fallback.
+   2D, Blob downloads and Clipboard API with a compatibility fallback.
    ============================================================ */
 
 function clamp(value, lo, hi) { return Math.min(hi, Math.max(lo, value)); }
@@ -583,7 +576,8 @@ function calculateDimensions(W_kN, Wc_kN_m3, profileKey, n) {
   const profile = profileByKey(profileKey);
   const volume = W_kN / Wc_kN_m3;
   const generatedKV = unitBrepVolumeCoefficient(profileKey, n);
-  const H = Math.cbrt(volume / profile.referenceVolumeCoefficient);
+  // Use Math.pow for deterministic browser output across the calculation and export paths.
+  const H = Math.pow(volume / profile.referenceVolumeCoefficient, 1.0 / 3.0);
   const A = profile.bottomWidthCoefficient * H;
   const B = profile.topWidthCoefficient * H;
   const D = profile.edgeChamferCoefficient * H;
@@ -1001,8 +995,6 @@ function updateTablesAndReport(brep, metrics, decimals) {
     ["Surface area [m²]", fmt(metrics.surfaceArea, decimals)]
   ]);
   activeReport = generateReport(brep, metrics, decimals);
-  const reportWindow = document.getElementById("report");
-  if (reportWindow) reportWindow.value = activeReport;
   renderEngineeringDrawings(brep);
 }
 
@@ -1191,8 +1183,8 @@ function renderEngineeringDrawings(brep = activeBrep) {
    The viewer is a lightweight software renderer. It avoids WebGL and external
    dependencies while preserving an isometric default view, zoom-to-extents
    fitting, pan, rotation, optional axes and wireframe display. The solid view
-   uses camera-space lighting, specular highlights, contact shadow and crease
-   emphasis to give the Antifer block a more realistic concrete appearance.
+   uses camera-space lighting, specular highlights and contact shadows to give
+   the Antifer block a more realistic concrete appearance.
    ============================================================ */
 
 const canvas = document.getElementById("viewer");
@@ -1227,7 +1219,8 @@ const view = {
   dragging: false,
   dragMode: "rotate",
   lastX: 0,
-  lastY: 0
+  lastY: 0,
+  manualBaseScale: null
 };
 
 function resizeCanvasToDisplaySize() {
@@ -1246,6 +1239,7 @@ function resetView() {
   view.zoom = INITIAL_VIEW_DEFAULTS.zoom;
   view.panX = INITIAL_VIEW_DEFAULTS.panX;
   view.panY = INITIAL_VIEW_DEFAULTS.panY;
+  view.manualBaseScale = null;
 
   const wireframeMode = document.getElementById("wireframeMode");
   const showAxes = document.getElementById("showAxes");
@@ -1289,7 +1283,18 @@ function fittedModelScale(vertices, rectW, rectH) {
   const fit = rotatedModelFit(vertices);
   const scaleX = VIEW_FIT_MARGIN * rectW / fit.width;
   const scaleY = VIEW_FIT_MARGIN * rectH / fit.height;
-  return { scale: Math.min(scaleX, scaleY) * view.zoom, centre: fit.centre };
+  const dynamicBaseScale = Math.min(scaleX, scaleY);
+  const autoRotate = document.getElementById("autoRotate");
+
+  if (autoRotate && autoRotate.checked) {
+    return { scale: dynamicBaseScale * view.zoom, centre: fit.centre };
+  }
+
+  if (!Number.isFinite(view.manualBaseScale) || view.manualBaseScale <= 0) {
+    view.manualBaseScale = dynamicBaseScale;
+  }
+
+  return { scale: view.manualBaseScale * view.zoom, centre: fit.centre };
 }
 function projectedVertices(vertices, modelScale, cx, cy, fitCentre) {
   const centre = fitCentre || [0, 0];
@@ -1385,11 +1390,6 @@ function triangulateFaceForRendering(face, vertices) {
     triangles.push([face[remaining[0]], face[remaining[1]], face[remaining[2]]]);
   }
   return triangles;
-}
-function renderTrianglesForBrep(vertices, faces) {
-  const tris = [];
-  for (const face of faces) tris.push(...triangulateFaceForRendering(face, vertices));
-  return tris;
 }
 function rgbText(rgb, alpha = 1.0) {
   const r = Math.round(clamp(rgb[0], 0, 255));
@@ -1488,48 +1488,6 @@ function faceAverageDepth(pv, face) {
   let sum = 0.0;
   for (const idx of face) sum += pv[idx].z;
   return sum / Math.max(face.length, 1);
-}
-function drawCreaseEdges(pv, faces) {
-  const faceNormals = faces.map(face => {
-    const tri = triangulateFaceForRendering(face, activeBrep.vertices)[0];
-    return tri ? triangleNormalCamera(pv, tri) : [0, 0, 0];
-  });
-  const edges = new Map();
-  for (let faceIndex = 0; faceIndex < faces.length; faceIndex++) {
-    const face = faces[faceIndex];
-    for (let i = 0; i < face.length; i++) {
-      const a = face[i];
-      const b = face[(i + 1) % face.length];
-      const key = edgeKey(a, b);
-      if (!edges.has(key)) edges.set(key, []);
-      edges.get(key).push({ a, b, faceIndex });
-    }
-  }
-
-  ctx.save();
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
-  ctx.lineWidth = Math.max(0.55, 0.72 * (window.devicePixelRatio || 1));
-  for (const entries of edges.values()) {
-    let draw = entries.length === 1;
-    if (entries.length === 2) {
-      const n0 = faceNormals[entries[0].faceIndex];
-      const n1 = faceNormals[entries[1].faceIndex];
-      draw = vDot(n0, n1) < 0.965;
-    }
-    if (!draw) continue;
-
-    const e = entries[0];
-    const za = pv[e.a].z;
-    const zb = pv[e.b].z;
-    const frontAlpha = clamp(0.10 + 0.08 * Math.max(za, zb), 0.10, 0.22);
-    ctx.strokeStyle = `rgba(0,0,0,${frontAlpha.toFixed(3)})`;
-    ctx.beginPath();
-    ctx.moveTo(pv[e.a].x, pv[e.a].y);
-    ctx.lineTo(pv[e.b].x, pv[e.b].y);
-    ctx.stroke();
-  }
-  ctx.restore();
 }
 function drawWireframeEdges(pv, faces, strokeStyle = "rgba(226,232,240,0.82)", lineWidth = null) {
   const seen = new Set();
@@ -1660,6 +1618,7 @@ canvas.addEventListener("wheel", ev => {
 }, { passive: false });
 canvas.addEventListener("dblclick", resetView);
 window.addEventListener("resize", () => {
+  view.manualBaseScale = null;
   render();
   renderEngineeringDrawings();
 });
@@ -1682,6 +1641,7 @@ requestAnimationFrame(animationLoop);
 
 function recalculate() {
   try {
+    view.manualBaseScale = null;
     const W = parsePositiveNumber("weight", "Antifer weight W");
     const Wc = parsePositiveNumber("unitWeight", "Concrete unit weight Wc");
     const arcPoints = DEFAULT_GROOVE_ARC_POINTS;
@@ -1693,7 +1653,6 @@ function recalculate() {
     const tol = Math.max(1.0e-10, Math.abs(brep.dimensions.volume) * VOLUME_TOLERANCE_RELATIVE);
     const ok = metrics.topology.closed && Math.abs(metrics.volumeError) <= tol * 10;
     activeBrep = brep;
-    activeMetrics = metrics;
     updateTablesAndReport(brep, metrics, decimals);
     render();
     setStatus(
@@ -1713,7 +1672,11 @@ document.getElementById("recalculate").addEventListener("click", recalculate);
 document.getElementById("resetView").addEventListener("click", resetView);
 document.getElementById("wireframeMode").addEventListener("change", render);
 document.getElementById("showAxes").addEventListener("change", render);
-for (const el of document.querySelectorAll("input[type=\"number\"], input[name=\"profile\"], select")) {
+document.getElementById("autoRotate").addEventListener("change", () => {
+  view.manualBaseScale = null;
+  render();
+});
+for (const el of document.querySelectorAll("input[type=\"number\"], input[name=\"profile\"]")) {
   el.addEventListener("change", recalculate);
 }
 document.getElementById("downloadObj").addEventListener("click", () => {
@@ -1747,6 +1710,7 @@ document.getElementById("copyReport").addEventListener("click", async () => {
 });
 
 recalculate();
+})();
 </script>
 </body>
 </html>
