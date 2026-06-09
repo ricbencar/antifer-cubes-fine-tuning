@@ -1,18 +1,17 @@
 # Concrete Antifer Cubes
-# Concrete Antifer Cubes
 
 ## Executive Summary
 
 Antifer cubes are massive grooved unreinforced concrete armour units used in rubble-mound breakwaters and related maritime protection works. They were developed for the Port of Antifer, Normandy, in the early 1970s, as a robust improvement over the plain concrete cube. The geometry remains compact and structurally conservative, but adds four lateral grooves and controlled tapering to improve hydraulic behaviour, roughness, interlock and resistance to face-to-face rearrangement.
 
-This repository contains a Python production tool that generates a closed vectorial Antifer armour-unit solid from an input unit weight `W` and concrete unit weight `Wc`. The tool exports the same validated geometry to IFC, STL, OBJ and DXF. It is a geometric CAD/BIM production and documentation tool; hydraulic stability design remains a separate project-specific task.
+This repository contains a Python production tool that generates a closed vectorial Antifer armour-unit solid from an input unit weight $W$ and concrete unit weight $W_c$. The tool exports the same validated geometry to IFC, STL, OBJ and DXF. It is a geometric CAD/BIM production and documentation tool; hydraulic stability design remains a separate project-specific task.
 
 Two dimensional conventions are implemented.
 
 | Convention | Purpose | Volume relation | Reference-height meaning |
 |---|---|---:|---|
-| Pita (1986) | historical proportional Antifer reference | V/H<sup>3</sup> = 1.024700000000 | drawing height used in the historical coefficient set |
-| Carvalho (2026) | volume-normalised CAD/BIM reference | V/H<sup>3</sup> = 1.000000000000 | H = D<sub>n</sub> = V<sup>1/3</sup> |
+| Pita (1986) | historical proportional Antifer reference | $V/H^3=1.024700000000$ | drawing height used in the historical coefficient set |
+| Carvalho (2026) | volume-normalised CAD/BIM reference | $V/H^3=1.000000000000$ | $H=D_n=V^{1/3}$ |
 
 The same vectorial topology is used in both conventions: a tapered body, no top bevel, four lateral plan chamfers and four single circular-arc side grooves. The Carvalho convention is obtained by horizontally normalising the Pita plan and groove coefficients by a common factor so that the final non-dimensional volume coefficient becomes unity.
 
@@ -57,17 +56,17 @@ These examples are engineering context only. They do not define a universal stab
 
 | Item | Adopted convention |
 |---|---|
-| Vertical reference | `H` is the total unit height |
-| Bottom section | `A` is the bottom bounding width at z = 0 |
-| Top section | `B` is the top bounding width at z = H |
+| Vertical reference | $H$ is the total unit height |
+| Bottom section | $A$ is the bottom bounding width at $z=0$ |
+| Top section | $B$ is the top bounding width at $z=H$ |
 | Top face | single horizontal plane; no top bevel |
-| Chamfers | `D` is a lateral plan-chamfer offset |
+| Chamfers | $D$ is a lateral plan-chamfer offset |
 | Grooves | four identical side grooves |
 | Groove type | one continuous circular arc per side |
-| Groove radius | `R`, with r = R/H |
-| Groove centre offset | `E`, with e = E/H, outside the side face |
-| Generated groove depth | C<sub>arc</sub> = R - E; c<sub>arc</sub> = r - e |
-| Groove half-opening | Q = sqrt(R<sup>2</sup> - E<sup>2</sup>); q = Q/H = sqrt(r<sup>2</sup> - e<sup>2</sup>) |
+| Groove radius | $R$, with $r=R/H$ |
+| Groove centre offset | $E$, with $e=E/H$, outside the side face |
+| Generated groove depth | $C_{\mathrm{arc}}=R-E$; $c_{\mathrm{arc}}=r-e$ |
+| Groove half-opening | $Q=\sqrt{R^2-E^2}$; $q=Q/H=\sqrt{r^2-e^2}$ |
 | Geometry source | pure vectorial B-rep generation; no imported template geometry |
 
 ### Master Coefficient Table
@@ -76,36 +75,36 @@ All Pita and Carvalho coefficients used by the production script are consolidate
 
 | Quantity | Meaning | Pita (1986) | Carvalho (2026) |
 |---|---|---:|---:|
-| K<sub>V</sub> | final volume coefficient, V/H<sup>3</sup> | 1.024700000000 | 1.000000000000 |
-| f | horizontal factor applied to Pita coefficients | 1.000000000000 | 0.987874174182 |
-| a = A/H | bottom width coefficient | 1.086000000000 | 1.072831353161 |
-| b = B/H | top width coefficient | 1.005000000000 | 0.992813545052 |
-| d = D/H | lateral chamfer coefficient | 0.024000000000 | 0.023708980180 |
-| r = R/H | groove-radius coefficient | 0.121500000000 | 0.120026712163 |
-| e = E/H | outside groove-centre offset | 0.025906459610 | 0.025592322393 |
-| c<sub>arc</sub> = r - e | generated circular-arc groove-depth coefficient | 0.095593540390 | 0.094434389770 |
-| q = sqrt(r<sup>2</sup> - e<sup>2</sup>) | groove half-opening coefficient | 0.118705961731 | 0.117266553915 |
-| 2q | full groove-opening coefficient | 0.237411923462 | 0.234533107831 |
+| $K_V$ | final volume coefficient, $V/H^3$ | 1.024700000000 | 1.000000000000 |
+| $f$ | horizontal factor applied to Pita coefficients | 1.000000000000 | 0.987874174182 |
+| $a=A/H$ | bottom width coefficient | 1.086000000000 | 1.072831353161 |
+| $b=B/H$ | top width coefficient | 1.005000000000 | 0.992813545052 |
+| $d=D/H$ | lateral chamfer coefficient | 0.024000000000 | 0.023708980180 |
+| $r=R/H$ | groove-radius coefficient | 0.121500000000 | 0.120026712163 |
+| $e=E/H$ | outside groove-centre offset | 0.025906459610 | 0.025592322393 |
+| $c_{\mathrm{arc}}=r-e$ | generated circular-arc groove-depth coefficient | 0.095593540390 | 0.094434389770 |
+| $q=\sqrt{r^2-e^2}$ | groove half-opening coefficient | 0.118705961731 | 0.117266553915 |
+| $2q$ | full groove-opening coefficient | 0.237411923462 | 0.234533107831 |
 
-The historical Pita notation often reports C/H = 0.095600. The production geometry uses the volume-consistent circular-arc value c<sub>arc</sub> = 0.095593540390, which is the generated depth obtained from C<sub>arc</sub> = R - E.
+The historical Pita notation often reports $C/H=0.095600$. The production geometry uses the volume-consistent circular-arc value $c_{\mathrm{arc}}=0.095593540390$, which is the generated depth obtained from $C_{\mathrm{arc}}=R-E$.
 
 ## Algebraic Volume Definition
 
 The generated unit volume is computed from a simple geometric balance.
 
-```math
+$$
 \frac{V}{H^3}=K_{\mathrm{frustum}}-K_{\mathrm{chamfers}}-K_{\mathrm{grooves}}
-```
+$$
 
 The components are:
 
 | Component | Non-dimensional expression | Meaning |
 |---|---|---|
-| Gross tapered square frustum | K<sub>frustum</sub> = (a<sup>2</sup> + ab + b<sup>2</sup>) / 3 | volume before groove and chamfer removals |
-| Four corner chamfers | K<sub>chamfers</sub> = 2d<sup>2</sup> | four triangular plan removals carried through the height |
-| One circular groove | A<sub>g</sub> = r<sup>2</sup> arccos(e/r) - e sqrt(r<sup>2</sup> - e<sup>2</sup>) | circular-segment area removed by one side groove |
-| Four side grooves | K<sub>grooves</sub> = 4A<sub>g</sub> | total groove subtraction |
-| Final coefficient | K<sub>V</sub> = K<sub>frustum</sub> - K<sub>chamfers</sub> - K<sub>grooves</sub> | final value of V/H<sup>3</sup> |
+| Gross tapered square frustum | $K_{\mathrm{frustum}}=(a^2+ab+b^2)/3$ | volume before groove and chamfer removals |
+| Four corner chamfers | $K_{\mathrm{chamfers}}=2d^2$ | four triangular plan removals carried through the height |
+| One circular groove | $A_g=r^2\arccos(e/r)-e\sqrt{r^2-e^2}$ | circular-segment area removed by one side groove |
+| Four side grooves | $K_{\mathrm{grooves}}=4A_g$ | total groove subtraction |
+| Final coefficient | $K_V=K_{\mathrm{frustum}}-K_{\mathrm{chamfers}}-K_{\mathrm{grooves}}$ | final value of $V/H^3$ |
 
 ### Demonstration of the Square-Frustum Formula
 
@@ -191,87 +190,87 @@ This is the gross body used before subtracting the four lateral corner chamfers 
 
 ### Compact Numerical Balance
 
-| Convention | Gross frustum | Chamfers | Grooves | Final V/H<sup>3</sup> |
+| Convention | Gross frustum | Chamfers | Grooves | Final $V/H^3$ |
 |---|---:|---:|---:|---:|
 | Pita (1986) | 1.093617000000 | 0.001152000000 | 0.067765000000 | 1.024700000000 |
 | Carvalho (2026) | 1.067255782180 | 0.001124231482 | 0.066131550698 | 1.000000000000 |
 
 For Pita, the one-groove area is:
 
-```math
+$$
 A_g=\frac{1.092465000000-1.024700000000}{4}=0.016941250000
-```
+$$
 
 With r = 0.121500000000, this value is obtained by solving:
 
-```math
+$$
 A_g=r^2\arccos\left(\frac{e}{r}\right)-e\sqrt{r^2-e^2}
-```
+$$
 
 which gives:
 
-```math
+$$
 e=0.025906459610,\qquad q=0.118705961731,\qquad c_{\mathrm{arc}}=0.095593540390
-```
+$$
 
 For Carvalho, all Pita horizontal plan and groove coefficients are multiplied by:
 
-```math
+$$
 f=\sqrt{\frac{1.000000000000}{1.024700000000}}=0.987874174182
-```
+$$
 
-Because the vertical reference height remains `H`, the non-dimensional area terms scale with f<sup>2</sup>, giving K<sub>V</sub> = 1.000000000000.
+Because the vertical reference height remains $H$, the non-dimensional area terms scale with $f^2$, giving $K_V=1.000000000000$.
 
 ## Dimensional Scaling from Input Weight
 
-The script uses the input unit weight `W` and concrete unit weight `Wc` to compute the unit volume:
+The script uses the input unit weight $W$ and concrete unit weight $W_c$ to compute the unit volume:
 
-```math
+$$
 V=\frac{W}{W_c}
-```
+$$
 
 The selected dimensional convention then gives the reference height:
 
 | Convention | Height relation |
 |---|---|
-| Pita (1986) | H = (V / 1.024700000000)<sup>1/3</sup> |
-| Carvalho (2026) | H = V<sup>1/3</sup> = D<sub>n</sub> |
+| Pita (1986) | $H=(V/1.024700000000)^{1/3}$ |
+| Carvalho (2026) | $H=V^{1/3}=D_n$ |
 
-Once `H` is known, all absolute dimensions are obtained by multiplying the coefficient table values by `H`. For example, A = aH, B = bH, D = dH, R = rH and E = eH.
+Once $H$ is known, all absolute dimensions are obtained by multiplying the coefficient table values by $H$. For example, $A=aH$, $B=bH$, $D=dH$, $R=rH$ and $E=eH$.
 
 ## Nominal Diameter
 
 The Van der Meer nominal diameter is:
 
-```math
+$$
 D_n=V^{1/3}
-```
+$$
 
-The relation between D<sub>n</sub> and the drawing height depends on the selected convention:
+The relation between $D_n$ and the drawing height depends on the selected convention:
 
 | Convention | Relation |
 |---|---|
-| Pita (1986) | D<sub>n</sub> = (1.024700000000)<sup>1/3</sup> H = 1.008166460709H |
-| Carvalho (2026) | D<sub>n</sub> = H |
+| Pita (1986) | $D_n=(1.024700000000)^{1/3}H=1.008166460709H$ |
+| Carvalho (2026) | $D_n=H$ |
 
-This distinction is important when hydraulic sizing is expressed through D<sub>n</sub> but CAD geometry is generated through a drawing height `H`.
+This distinction is important when hydraulic sizing is expressed through $D_n$ but CAD geometry is generated through a drawing height $H$.
 
 ## Horizontal Section and Groove Construction
 
-A horizontal section has local half-width h = w/(2H), where `w` is the non-dimensional section width. The east-side groove can be written in local non-dimensional coordinates as:
+A horizontal section has local half-width $h=w/(2H)$, where $w$ is the non-dimensional section width. The east-side groove can be written in local non-dimensional coordinates as:
 
-```math
+$$
 x(y)=h+e-\sqrt{r^2-y^2},\qquad -q\le y\le q
-```
+$$
 
 Key points are:
 
 | Feature | Coordinate or relation |
 |---|---|
-| Groove mouth | y = ±q, x = h |
-| Deepest groove point | y = 0, x = h + e - r = h - c<sub>arc</sub> |
+| Groove mouth | $y=\pm q$, $x=h$ |
+| Deepest groove point | $y=0$, $x=h+e-r=h-c_{\mathrm{arc}}$ |
 | Other sides | obtained by 90-degree rotations |
-| Corner chamfers | four lateral plan chamfers using offset d |
+| Corner chamfers | four lateral plan chamfers using offset $d$ |
 
 This section definition is used consistently in IFC, STL, OBJ and DXF exports.
 
@@ -281,33 +280,33 @@ Antifer hydraulic stability is not governed by geometry alone. It depends strong
 
 The Hudson formula remains a common preliminary sizing relation:
 
-```math
+$$
 W=\frac{\gamma_c H_D^3}{K_D\Delta^3\cot\alpha},\qquad
 \Delta=\frac{\gamma_c}{\gamma_w}-1
-```
+$$
 
 The stability number formulation is often more convenient for comparison:
 
-```math
+$$
 N_s=\frac{H_s}{\Delta D_n}
-```
+$$
 
 For regular two-layer cubes and Antifer-calibrated formulae, a Van der Meer-type empirical structure may be used:
 
-```math
+$$
 N_s=\left(k_1\frac{N_{od}^{k_2}}{N_z^{k_3}}+k_4\right)s_{0m}^{-k_5}
-```
+$$
 
 Typical coefficient sets are:
 
-| Armour unit and slope | k<sub>1</sub> | k<sub>2</sub> | k<sub>3</sub> | k<sub>4</sub> | k<sub>5</sub> |
+| Armour unit and slope | $k_1$ | $k_2$ | $k_3$ | $k_4$ | $k_5$ |
 |---|---:|---:|---:|---:|---:|
 | Regular cube, cot α = 1.5 | 6.700 | 0.400 | 0.300 | 1.000 | 0.100 |
 | Regular cube, cot α = 2.0 | 7.374 | 0.400 | 0.300 | 1.101 | 0.100 |
 | Antifer, cot α = 1.5 | 6.951 | 0.443 | 0.291 | 1.082 | 0.082 |
 | Antifer, cot α = 2.0 | 6.138 | 0.443 | 0.276 | 1.164 | 0.070 |
 
-These formulae are preliminary design tools, not substitutes for project-specific verification. Reported K<sub>D</sub> values for Antifer vary widely because placement method and damage definition dominate the result.
+These formulae are preliminary design tools, not substitutes for project-specific verification. Reported $K_D$ values for Antifer vary widely because placement method and damage definition dominate the result.
 
 ## Placement, Packing and Failure Modes
 
@@ -408,8 +407,8 @@ python script_final_production.py
 
 Typical workflow:
 
-1. Enter the Antifer unit weight `W` in kN.
-2. Enter the concrete unit weight `Wc` in kN/m<sup>3</sup>.
+1. Enter the Antifer unit weight $W$ in kN.
+2. Enter the concrete unit weight $W_c$ in kN/m$^3$.
 3. Select Pita (1986) or Carvalho (2026).
 4. Select the output folder.
 5. Review the calculation and validation preview.
@@ -459,7 +458,7 @@ Before issuing geometry for technical use, check:
 | chamfers | four lateral plan chamfers only |
 | grooves | one circular arc per side, radius R, centre offset E |
 | closed shell | every B-rep edge shared by exactly two faces |
-| volume | generated volume matches the selected K<sub>V</sub> |
+| volume | generated volume matches the selected $K_V$ |
 | IFC/STL/OBJ/DXF | all formats generated from the same B-rep source |
 | output report | dimensions and validation values recorded in `output.txt` |
 
@@ -471,14 +470,14 @@ This repository does not provide:
 - prototype monitoring data;
 - finite-element structural-integrity analysis;
 - a complete breakwater design method;
-- a universal Antifer K<sub>D</sub>;
+- a universal Antifer $K_D$;
 - project-specific wave, overtopping, toe, crest or underlayer verification.
 
 Critical works should be verified through physical modelling or equivalent project-specific evidence.
 
 ## Conclusions
 
-The production geometry is a reproducible algebraic reconstruction of an Antifer cube as a square frustum with four lateral plan chamfers and four circular side grooves. Pita preserves the historical volume coefficient V/H<sup>3</sup> = 1.024700000000. Carvalho keeps the same topology but horizontally normalises the plan and groove coefficients so that V/H<sup>3</sup> = 1.000000000000 and H = D<sub>n</sub>.
+The production geometry is a reproducible algebraic reconstruction of an Antifer cube as a square frustum with four lateral plan chamfers and four circular side grooves. Pita preserves the historical volume coefficient $V/H^3=1.024700000000$. Carvalho keeps the same topology but horizontally normalises the plan and groove coefficients so that $V/H^3=1.000000000000$ and $H=D_n$.
 
 The geometric definition is necessary for reliable CAD/BIM production, drawing control, volume calculation and quality assurance. It does not remove the need for hydraulic verification. Antifer stability remains governed primarily by armour-layer placement, packing density, wave climate, slope, storm duration, toe support, construction tolerance and accepted damage.
 
