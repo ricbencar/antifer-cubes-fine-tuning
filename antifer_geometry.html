@@ -16,7 +16,7 @@
   - SI units are used internally; exported coordinates are in metres.
   - The physical bottom datum is z = 0.
   - X and Y exported coordinates are shifted to the homogeneous centre of mass.
-  - Groove sampling is fixed to 144 arc points for deterministic OBJ/STL triangulation.
+  - Groove sampling defaults to 144 arc points and can be changed by the user.
 -->
 <html lang="en">
 <head>
@@ -69,6 +69,7 @@
     .viewer-wrap { position: relative; min-height: 580px; }
     #viewer { width: 100%; height: 580px; display: block; background: #2d304c; border-bottom: 1px solid var(--line); cursor: grab; }
     #viewer:active { cursor: grabbing; }
+    #viewer.measure-mode, #viewer.measure-mode:active { cursor: crosshair; }
     .viewer-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 12px 16px; background: var(--panel2); }
     .viewer-tools label { display: flex; align-items: center; gap: 7px; font-size: 14px; color: var(--text); }
     .tables { display: grid; grid-template-columns: repeat(2, minmax(300px, 1fr)); gap: 16px; padding: 16px; }
@@ -130,7 +131,7 @@
         </div>
         <div class="field">
           <label for="arcPoints">Groove arc points</label>
-          <input id="arcPoints" type="number" min="144" max="144" step="1" value="144" readonly />
+          <input id="arcPoints" type="number" min="8" max="720" step="1" value="144" />
         </div>
         <div class="field">
           <label for="precision">Displayed decimals</label>
@@ -158,10 +159,13 @@
     <h2>3D visualisation</h2>
     <canvas id="viewer" width="1200" height="760"></canvas>
     <div class="viewer-tools">
-      <label><input type="checkbox" id="wireframeMode" /> Wireframe mode</label>
       <label><input type="checkbox" id="showAxes" checked /> Axes</label>
+      <label><input type="checkbox" id="wireframeMode" /> Wireframe</label>
       <label><input type="checkbox" id="autoRotate" /> Auto-rotate</label>
-      <span class="small">Drag to rotate. Right/middle/Shift-drag to pan. Mouse wheel to zoom. Double-click to reset.</span>
+      <label><input type="checkbox" id="measureMode" /> Measure</label>
+      <button class="ghost" id="clearMeasurements" type="button">Clear</button>
+      <span class="small" id="measureReadout">Measurement: off</span>
+      <span class="small">Drag to rotate. Right/middle/Shift-drag to pan. Mouse wheel to zoom. Double-click to reset. In measurement mode, click near visible mesh vertices; OSNAP selects the nearest visible point.</span>
     </div>
   </section>
 </main>
@@ -214,12 +218,15 @@
 
    These constants define the two supported Antifer profiles. Geometry is
    generated analytically from coefficients; no hidden template mesh is used.
-   Keep DEFAULT_GROOVE_ARC_POINTS fixed at 144 for deterministic OBJ/STL
-   triangulation and reproducible validation metrics.
+   DEFAULT_GROOVE_ARC_POINTS preserves the historical default. The user
+   can change the sampling density within a bounded range for OBJ/STL
+   triangulation, B-rep validation and viewer rendering.
    ============================================================ */
 
 const STANDARD_GRAVITY_M_S2 = 9.80665;
 const DEFAULT_GROOVE_ARC_POINTS = 144;
+const MIN_GROOVE_ARC_POINTS = 8;
+const MAX_GROOVE_ARC_POINTS = 720;
 const VOLUME_TOLERANCE_RELATIVE = 1.0e-10;
 
 const PITA_HISTORICAL_VOLUME_COEFFICIENT = 1.024700000000;
@@ -625,6 +632,7 @@ function generateAntiferBrep(W_kN, Wc_kN_m3, profileKey, n) {
   const exportedCentroid = signedBrepVolumeAndCentroid(vertices, raw.faces).centroid;
   return {
     dimensions,
+    arcPoints: n,
     vertices,
     faces: raw.faces,
     volume,
@@ -900,6 +908,7 @@ function generateReport(brep, metrics, decimals) {
   lines.push(`Concrete unit weight Wc [kN/m3] : ${fmt(d.Wc_kN_m3, decimals)}`);
   lines.push(`Input volume W/Wc [m3]          : ${fmt(d.volume, decimals)}`);
   lines.push(`Equivalent mass [t]             : ${fmt(d.W_ton, decimals)}`);
+  lines.push(`Groove arc points               : ${brep.arcPoints}`);
   lines.push("");
   lines.push("NON-DIMENSIONAL COEFFICIENTS");
   lines.push("-".repeat(72));
@@ -954,7 +963,8 @@ function updateTablesAndReport(brep, metrics, decimals) {
     ["W [kN]", fmt(d.W_kN, decimals)],
     ["Wc [kN/m³]", fmt(d.Wc_kN_m3, decimals)],
     ["V = W/Wc [m³]", fmt(d.volume, decimals)],
-    ["Equivalent mass [t]", fmt(d.W_ton, decimals)]
+    ["Equivalent mass [t]", fmt(d.W_ton, decimals)],
+    ["Groove arc points", String(brep.arcPoints)]
   ]);
   fillTable("tableCoefficients", [
     ["Reference kV", fmt(d.referenceVolumeCoefficient, 12)],
@@ -1091,7 +1101,7 @@ function drawDrawingFrame(g, width, height, ratio) {
   g.lineWidth = 1 * ratio;
   g.strokeRect(0.5 * ratio, 0.5 * ratio, width - ratio, height - ratio);
 }
-function drawPlanDrawing(canvasId, widthValue, dimensionSymbol, d, decimals) {
+function drawPlanDrawing(canvasId, widthValue, dimensionSymbol, d, decimals, arcPoints = DEFAULT_GROOVE_ARC_POINTS) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
   const { ctx: g, width, height, ratio } = prepareDrawingCanvas(canvas);
@@ -1112,7 +1122,7 @@ function drawPlanDrawing(canvasId, widthValue, dimensionSymbol, d, decimals) {
   g.strokeStyle = "#ffffff";
   g.lineWidth = 2.3 * ratio;
   g.lineJoin = "round";
-  drawPolyline2D(g, tr, section2D(widthValue, d.D, d.R, d.grooveCentreOffset, DEFAULT_GROOVE_ARC_POINTS), true);
+  drawPolyline2D(g, tr, section2D(widthValue, d.D, d.R, d.grooveCentreOffset, arcPoints), true);
 
   g.strokeStyle = "#dbeafe";
   g.lineWidth = 1.05 * ratio;
@@ -1172,9 +1182,9 @@ function renderEngineeringDrawings(brep = activeBrep) {
   if (!brep || !brep.dimensions) return;
   const decimals = parseIntegerInRange("precision", "Displayed decimals", 3, 12);
   const d = brep.dimensions;
-  drawPlanDrawing("drawingTop", d.B, "B", d, decimals);
+  drawPlanDrawing("drawingTop", d.B, "B", d, decimals, brep.arcPoints || DEFAULT_GROOVE_ARC_POINTS);
   drawFrontDrawing("drawingFront", d, decimals);
-  drawPlanDrawing("drawingBottom", d.A, "A", d, decimals);
+  drawPlanDrawing("drawingBottom", d.A, "A", d, decimals, brep.arcPoints || DEFAULT_GROOVE_ARC_POINTS);
 }
 
 /* ============================================================
@@ -1198,6 +1208,8 @@ const FILL_LIGHT_DIRECTION_CAMERA = vNormalize([0.82, 0.18, 0.34]);
 const CONCRETE_BASE_RGB = [134, 136, 134];
 const CONCRETE_WARM_RGB = [224, 225, 220];
 const CONCRETE_COOL_RGB = [18, 21, 24];
+const MEASUREMENT_SNAP_TOLERANCE_CSS_PX = 18.0;
+const MEASUREMENT_SNAP_CANDIDATE_LIMIT = 16;
 
 const INITIAL_VIEW_DEFAULTS = Object.freeze({
   yaw: ISOMETRIC_YAW,
@@ -1207,7 +1219,8 @@ const INITIAL_VIEW_DEFAULTS = Object.freeze({
   panY: 0,
   wireframeMode: false,
   showAxes: true,
-  autoRotate: false
+  autoRotate: false,
+  measureMode: false
 });
 
 const view = {
@@ -1221,6 +1234,12 @@ const view = {
   lastX: 0,
   lastY: 0,
   manualBaseScale: null
+};
+
+const measurementState = {
+  points: [],
+  notice: "",
+  snapCandidate: null
 };
 
 function resizeCanvasToDisplaySize() {
@@ -1244,10 +1263,14 @@ function resetView() {
   const wireframeMode = document.getElementById("wireframeMode");
   const showAxes = document.getElementById("showAxes");
   const autoRotate = document.getElementById("autoRotate");
+  const measureMode = document.getElementById("measureMode");
 
   if (wireframeMode) wireframeMode.checked = INITIAL_VIEW_DEFAULTS.wireframeMode;
   if (showAxes) showAxes.checked = INITIAL_VIEW_DEFAULTS.showAxes;
   if (autoRotate) autoRotate.checked = INITIAL_VIEW_DEFAULTS.autoRotate;
+  if (measureMode) measureMode.checked = INITIAL_VIEW_DEFAULTS.measureMode;
+  canvas.classList.toggle("measure-mode", Boolean(measureMode && measureMode.checked));
+  clearMeasurements(false);
 
   render();
 }
@@ -1534,6 +1557,238 @@ function renderAxes(modelScale, cx, cy, fitCentre) {
   }
   ctx.restore();
 }
+
+function measurementModeEnabled() {
+  const el = document.getElementById("measureMode");
+  return Boolean(el && el.checked);
+}
+function measurementDistance() {
+  if (measurementState.points.length < 2) return null;
+  return vLen(vSub(measurementState.points[1].model, measurementState.points[0].model));
+}
+function updateMeasurementReadout() {
+  const readout = document.getElementById("measureReadout");
+  if (!readout) return;
+  if (!measurementModeEnabled()) {
+    readout.textContent = "Measurement: off";
+    return;
+  }
+  if (measurementState.notice) {
+    readout.textContent = measurementState.notice;
+    return;
+  }
+  if (measurementState.points.length === 0) {
+    readout.textContent = "Measurement: click near the first visible mesh vertex (OSNAP nearest).";
+    return;
+  }
+  if (measurementState.points.length === 1) {
+    readout.textContent = "Measurement: first snap point selected; click near the second visible mesh vertex.";
+    return;
+  }
+  const p1 = measurementState.points[0].model;
+  const p2 = measurementState.points[1].model;
+  const dx = p2[0] - p1[0];
+  const dy = p2[1] - p1[1];
+  const dz = p2[2] - p1[2];
+  const decimals = parseIntegerInRange("precision", "Displayed decimals", 3, 12);
+  readout.textContent = `Measurement: ${fmt(measurementDistance(), decimals)} m | ΔX=${fmt(dx, decimals)} m, ΔY=${fmt(dy, decimals)} m, ΔZ=${fmt(dz, decimals)} m`;
+}
+function clearMeasurements(renderAfter = true) {
+  measurementState.points = [];
+  measurementState.notice = "";
+  measurementState.snapCandidate = null;
+  updateMeasurementReadout();
+  if (renderAfter) render();
+}
+function setMeasurementMode(enabled) {
+  const measureMode = document.getElementById("measureMode");
+  if (measureMode) measureMode.checked = enabled;
+  canvas.classList.toggle("measure-mode", enabled);
+  if (!enabled) clearMeasurements(false);
+  measurementState.notice = "";
+  updateMeasurementReadout();
+  render();
+}
+function currentProjectionState() {
+  const rectW = canvas.width;
+  const rectH = canvas.height;
+  const cx = rectW / 2;
+  const cy = rectH / 2;
+  const fit = fittedModelScale(activeBrep.vertices, rectW, rectH);
+  return { rectW, rectH, cx, cy, fit, modelScale: fit.scale };
+}
+function canvasPointFromMouseEvent(ev) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / Math.max(rect.width, 1.0);
+  const scaleY = canvas.height / Math.max(rect.height, 1.0);
+  return {
+    x: (ev.clientX - rect.left) * scaleX,
+    y: (ev.clientY - rect.top) * scaleY
+  };
+}
+function barycentricWeights2D(px, py, a, b, c) {
+  const ax = a[0], ay = a[1];
+  const bx = b[0], by = b[1];
+  const cx = c[0], cy = c[1];
+  const denom = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy);
+  if (Math.abs(denom) <= 1.0e-12) return null;
+  const wA = ((by - cy) * (px - cx) + (cx - bx) * (py - cy)) / denom;
+  const wB = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / denom;
+  const wC = 1.0 - wA - wB;
+  const tolerance = -1.0e-7;
+  if (wA < tolerance || wB < tolerance || wC < tolerance) return null;
+  return [wA, wB, wC];
+}
+function combineTrianglePoint(vertices, tri, weights) {
+  const a = vertices[tri[0]], b = vertices[tri[1]], c = vertices[tri[2]];
+  return [
+    weights[0] * a[0] + weights[1] * b[0] + weights[2] * c[0],
+    weights[0] * a[1] + weights[1] * b[1] + weights[2] * c[1],
+    weights[0] * a[2] + weights[1] * b[2] + weights[2] * c[2]
+  ];
+}
+function frontSurfaceDepthAtScreenPoint(x, y, projected) {
+  let bestDepth = -Infinity;
+  for (const face of activeBrep.faces) {
+    const triangles = triangulateFaceForRendering(face, activeBrep.vertices);
+    for (const tri of triangles) {
+      const a = projected[tri[0]];
+      const b = projected[tri[1]];
+      const c = projected[tri[2]];
+      const weights = barycentricWeights2D(x, y, [a.x, a.y], [b.x, b.y], [c.x, c.y]);
+      if (!weights) continue;
+      const depth = weights[0] * a.z + weights[1] * b.z + weights[2] * c.z;
+      if (depth > bestDepth) bestDepth = depth;
+    }
+  }
+  return bestDepth;
+}
+function nearestVisibleSnapPoint(ev) {
+  if (!activeBrep) return null;
+  resizeCanvasToDisplaySize();
+  const mouse = canvasPointFromMouseEvent(ev);
+  const projection = currentProjectionState();
+  const projected = projectedVertices(activeBrep.vertices, projection.modelScale, projection.cx, projection.cy, projection.fit.centre);
+  const ratio = window.devicePixelRatio || 1;
+  const snapTolerancePx = MEASUREMENT_SNAP_TOLERANCE_CSS_PX * ratio;
+  const candidates = [];
+
+  for (let i = 0; i < projected.length; i++) {
+    const dx = projected[i].x - mouse.x;
+    const dy = projected[i].y - mouse.y;
+    const distancePx = Math.hypot(dx, dy);
+    if (distancePx > snapTolerancePx) continue;
+    candidates.push({ index: i, distancePx });
+  }
+
+  if (!candidates.length) return null;
+  candidates.sort((a, b) => a.distancePx - b.distancePx);
+
+  const visibilityTolerance = Math.max(1.0e-8, activeBrep.dimensions.H * 1.0e-6);
+  for (const candidate of candidates.slice(0, MEASUREMENT_SNAP_CANDIDATE_LIMIT)) {
+    const p = projected[candidate.index];
+    const frontDepth = frontSurfaceDepthAtScreenPoint(p.x, p.y, projected);
+    if (!Number.isFinite(frontDepth)) continue;
+    if (p.z < frontDepth - visibilityTolerance) continue;
+    return {
+      model: activeBrep.vertices[candidate.index].slice(),
+      camera: p.raw,
+      screen: { x: p.x, y: p.y },
+      vertexIndex: candidate.index,
+      distancePx: candidate.distancePx,
+      snapped: true
+    };
+  }
+
+  return null;
+}
+function updateSnapCandidate(ev, renderAfter = true) {
+  if (!measurementModeEnabled() || !activeBrep) {
+    measurementState.snapCandidate = null;
+    return;
+  }
+  measurementState.snapCandidate = nearestVisibleSnapPoint(ev);
+  if (renderAfter) render();
+}
+function handleMeasurementClick(ev) {
+  const pick = nearestVisibleSnapPoint(ev);
+  measurementState.snapCandidate = pick;
+  if (!pick) {
+    measurementState.notice = "Measurement: no visible snap point within tolerance.";
+    updateMeasurementReadout();
+    render();
+    return;
+  }
+  measurementState.notice = "";
+  if (measurementState.points.length >= 2) measurementState.points = [];
+  measurementState.points.push(pick);
+  updateMeasurementReadout();
+  render();
+}
+function renderSnapMarker(projectedPoint, ratio, fillStyle, strokeStyle, radiusFactor = 1.0) {
+  const radius = 6.5 * ratio * radiusFactor;
+  ctx.save();
+  ctx.lineWidth = 1.7 * ratio;
+  ctx.strokeStyle = strokeStyle;
+  ctx.fillStyle = fillStyle;
+  ctx.beginPath();
+  ctx.arc(projectedPoint.x, projectedPoint.y, radius, 0, 2.0 * Math.PI);
+  ctx.fill();
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(projectedPoint.x - radius * 1.55, projectedPoint.y);
+  ctx.lineTo(projectedPoint.x + radius * 1.55, projectedPoint.y);
+  ctx.moveTo(projectedPoint.x, projectedPoint.y - radius * 1.55);
+  ctx.lineTo(projectedPoint.x, projectedPoint.y + radius * 1.55);
+  ctx.stroke();
+  ctx.restore();
+}
+function renderMeasurements(modelScale, cx, cy, fitCentre) {
+  if (!measurementModeEnabled()) return;
+  const ratio = window.devicePixelRatio || 1;
+  const projected = projectedVertices(measurementState.points.map(p => p.model), modelScale, cx, cy, fitCentre);
+
+  ctx.save();
+  ctx.lineWidth = 2.0 * ratio;
+  ctx.strokeStyle = "rgba(96,165,250,0.96)";
+  ctx.fillStyle = "rgba(219,234,254,0.96)";
+  ctx.font = `${13 * ratio}px Consolas, monospace`;
+
+  if (projected.length >= 2) {
+    ctx.beginPath();
+    ctx.moveTo(projected[0].x, projected[0].y);
+    ctx.lineTo(projected[1].x, projected[1].y);
+    ctx.stroke();
+
+    const mx = 0.5 * (projected[0].x + projected[1].x);
+    const my = 0.5 * (projected[0].y + projected[1].y);
+    const decimals = parseIntegerInRange("precision", "Displayed decimals", 3, 12);
+    const label = `${fmt(measurementDistance(), decimals)} m`;
+    const padding = 5 * ratio;
+    const metrics = ctx.measureText(label);
+    ctx.fillStyle = "rgba(15,23,42,0.82)";
+    ctx.fillRect(mx - 0.5 * metrics.width - padding, my - 12 * ratio - padding, metrics.width + 2 * padding, 18 * ratio + 2 * padding);
+    ctx.fillStyle = "rgba(219,234,254,0.98)";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, mx, my - 3 * ratio);
+  }
+
+  for (const p of projected) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 4.5 * ratio, 0, 2.0 * Math.PI);
+    ctx.fillStyle = "rgba(219,234,254,0.98)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(96,165,250,0.98)";
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  if (measurementState.snapCandidate) {
+    const snap = projectedVertices([measurementState.snapCandidate.model], modelScale, cx, cy, fitCentre)[0];
+    renderSnapMarker(snap, ratio, "rgba(250,204,21,0.82)", "rgba(254,249,195,0.98)", 1.0);
+  }
+}
 function render() {
   resizeCanvasToDisplaySize();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1584,10 +1839,25 @@ function render() {
     ctx.restore();
   }
   renderAxes(modelScale, cx, cy, fit.centre);
+  renderMeasurements(modelScale, cx, cy, fit.centre);
 }
+
+canvas.addEventListener("mousemove", ev => {
+  if (measurementModeEnabled() && !view.dragging) updateSnapCandidate(ev);
+});
+canvas.addEventListener("mouseleave", () => {
+  if (!measurementState.snapCandidate) return;
+  measurementState.snapCandidate = null;
+  render();
+});
 
 canvas.addEventListener("contextmenu", ev => ev.preventDefault());
 canvas.addEventListener("mousedown", ev => {
+  if (measurementModeEnabled() && ev.button === 0 && !ev.shiftKey) {
+    ev.preventDefault();
+    handleMeasurementClick(ev);
+    return;
+  }
   view.dragging = true;
   view.dragMode = (ev.button === 1 || ev.button === 2 || ev.shiftKey) ? "pan" : "rotate";
   view.lastX = ev.clientX;
@@ -1616,7 +1886,14 @@ canvas.addEventListener("wheel", ev => {
   view.zoom = clamp(view.zoom * factor, 0.25, 6.0);
   render();
 }, { passive: false });
-canvas.addEventListener("dblclick", resetView);
+canvas.addEventListener("dblclick", ev => {
+  if (measurementModeEnabled()) {
+    ev.preventDefault();
+    clearMeasurements();
+    return;
+  }
+  resetView();
+});
 window.addEventListener("resize", () => {
   view.manualBaseScale = null;
   render();
@@ -1644,8 +1921,7 @@ function recalculate() {
     view.manualBaseScale = null;
     const W = parsePositiveNumber("weight", "Antifer weight W");
     const Wc = parsePositiveNumber("unitWeight", "Concrete unit weight Wc");
-    const arcPoints = DEFAULT_GROOVE_ARC_POINTS;
-    document.getElementById("arcPoints").value = String(arcPoints);
+    const arcPoints = parseIntegerInRange("arcPoints", "Groove arc points", MIN_GROOVE_ARC_POINTS, MAX_GROOVE_ARC_POINTS);
     const decimals = parseIntegerInRange("precision", "Displayed decimals", 3, 12);
     const profileKey = selectedProfileKey();
     const brep = generateAntiferBrep(W, Wc, profileKey, arcPoints);
@@ -1653,11 +1929,13 @@ function recalculate() {
     const tol = Math.max(1.0e-10, Math.abs(brep.dimensions.volume) * VOLUME_TOLERANCE_RELATIVE);
     const ok = metrics.topology.closed && Math.abs(metrics.volumeError) <= tol * 10;
     activeBrep = brep;
+    clearMeasurements(false);
     updateTablesAndReport(brep, metrics, decimals);
     render();
     setStatus(
       `Profile: ${brep.dimensions.profile.label}\n` +
       `Generated volume = ${fmt(metrics.volume, decimals)} m³\n` +
+      `Groove arc points = ${arcPoints}\n` +
       `Relative volume error = ${sci(metrics.relativeVolumeError, 6)}\n` +
       `Topology: ${metrics.topology.closed ? "closed shell" : "NOT CLOSED"}`,
       ok
@@ -1675,6 +1953,12 @@ document.getElementById("showAxes").addEventListener("change", render);
 document.getElementById("autoRotate").addEventListener("change", () => {
   view.manualBaseScale = null;
   render();
+});
+document.getElementById("measureMode").addEventListener("change", ev => {
+  setMeasurementMode(ev.target.checked);
+});
+document.getElementById("clearMeasurements").addEventListener("click", () => {
+  clearMeasurements();
 });
 for (const el of document.querySelectorAll("input[type=\"number\"], input[name=\"profile\"]")) {
   el.addEventListener("change", recalculate);
