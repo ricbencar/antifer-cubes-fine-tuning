@@ -1,4 +1,5 @@
 # Concrete Antifer Cubes
+# Concrete Antifer Cubes
 
 ## Executive Summary
 
@@ -108,47 +109,83 @@ The components are:
 
 ### Demonstration of the Square-Frustum Formula
 
-Let a square frustum have height `H`, lower width `A` and upper width `B`. At a vertical coordinate `z`, measured from the bottom, the linearly interpolated side length is:
+Let a square frustum have height $H$, lower width $A$ and upper width $B$. At a vertical coordinate $z$, measured from the bottom, the linearly interpolated side length is:
 
-```math
-s(z)=A+\frac{B-A}{H}z
-```
 
-The horizontal area at level `z` is:
+$$
+s(z)=A+\frac{B-A}{H}z.
+$$
 
-```math
-S(z)=s(z)^2
-```
+
+The horizontal area at level $z$ is:
+
+
+$$
+S(z)=s(z)^2.
+$$
+
 
 The frustum volume is therefore:
 
-```math
-V_{\mathrm{frustum}}=\int_0^H\left(A+\frac{B-A}{H}z\right)^2\,dz
-```
+
+$$
+V_{\mathrm{frustum}}
+=
+\int_0^H
+\left(A+\frac{B-A}{H}z\right)^2
+\,dz.
+$$
+
 
 Expanding and integrating:
 
-```math
-V_{\mathrm{frustum}}
-=\int_0^H\left[A^2+2A\frac{B-A}{H}z+\left(\frac{B-A}{H}\right)^2z^2\right]dz
-```
 
-```math
+$$
 V_{\mathrm{frustum}}
-=A^2H+A(B-A)H+\frac{(B-A)^2}{3}H
-```
+=
+\int_0^H
+\left[
+A^2
++
+2A\frac{B-A}{H}z
++
+\left(\frac{B-A}{H}\right)^2z^2
+\right]dz,
+$$
+
+
+
+$$
+V_{\mathrm{frustum}}
+=
+A^2H
++
+A(B-A)H
++
+\frac{(B-A)^2}{3}H.
+$$
+
 
 Collecting terms gives:
 
-```math
-V_{\mathrm{frustum}}=\frac{H}{3}\left(A^2+AB+B^2\right)
-```
 
-Using `a = A/H` and `b = B/H`:
+$$
+V_{\mathrm{frustum}}
+=
+\frac{H}{3}
+\left(A^2+AB+B^2\right).
+$$
 
-```math
-\frac{V_{\mathrm{frustum}}}{H^3}=\frac{a^2+ab+b^2}{3}
-```
+
+Using $a=A/H$ and $b=B/H$:
+
+
+$$
+\frac{V_{\mathrm{frustum}}}{H^3}
+=
+\frac{a^2+ab+b^2}{3}.
+$$
+
 
 This is the gross body used before subtracting the four lateral corner chamfers and the four circular side grooves.
 
