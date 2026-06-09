@@ -43,7 +43,7 @@ Representative contexts in which Antifer units have been used or studied include
 | Sines West Breakwater | repair and rehabilitation after Dolos armour-layer failure |
 | Zeebrugge | prototype overtopping and run-up measurements |
 | Douro Bar / Cabedelo do Douro | model testing, high-density units and monitoring |
-| Leixoes Outer Breakwater | contemporary Portuguese port-extension use |
+| Leixões Outer Breakwater | contemporary Portuguese port-extension use |
 | Lajes das Flores | Atlantic island-port emergency protection and reconstruction |
 | Mohammedia | severe-exposure international breakwater context |
 | Brunei | documented manufacture, curing and placement practice |
@@ -92,7 +92,6 @@ The historical Pita notation often reports $C/H=0.095600$. The production geomet
 
 The generated unit volume is computed from a simple geometric balance:
 
-
 $$
 \frac{V}{H^3}
 =
@@ -100,17 +99,16 @@ K_{\mathrm{frustum}}
 -
 K_{\mathrm{chamfers}}
 -
-K_{\mathrm{grooves}}.
+K_{\mathrm{grooves}}
 $$
-
 
 The components are:
 
 | Component | Non-dimensional expression | Meaning |
 |---|---:|---|
-| Gross tapered square frustum | $K_{\mathrm{frustum}}=(a^2+ab+b^2)/3$ | volume before groove and chamfer removals |
+| Gross tapered square frustum | $K_{\mathrm{frustum}}=\dfrac{a^2+ab+b^2}{3}$ | volume before groove and chamfer removals |
 | Four corner chamfers | $K_{\mathrm{chamfers}}=2d^2$ | four triangular plan removals carried through the height |
-| One circular groove | $A_g=r^2\arccos(e/r)-e\sqrt{r^2-e^2}$ | circular-segment area removed by one side groove |
+| One circular groove | $A_g=r^2\arccos\left(\dfrac{e}{r}\right)-e\sqrt{r^2-e^2}$ | circular-segment area removed by one side groove |
 | Four side grooves | $K_{\mathrm{grooves}}=4A_g$ | total groove subtraction |
 | Final coefficient | $K_V=K_{\mathrm{frustum}}-K_{\mathrm{chamfers}}-K_{\mathrm{grooves}}$ | final value of $V/H^3$ |
 
@@ -118,34 +116,27 @@ The components are:
 
 Let a square frustum have height $H$, lower width $A$ and upper width $B$. At a vertical coordinate $z$, measured from the bottom, the linearly interpolated side length is:
 
-
 $$
-s(z)=A+\frac{B-A}{H}z.
+s(z)=A+\frac{B-A}{H}z
 $$
-
 
 The horizontal area at level $z$ is:
 
-
 $$
-S(z)=s(z)^2.
+S(z)=s(z)^2
 $$
-
 
 The frustum volume is therefore:
-
 
 $$
 V_{\mathrm{frustum}}
 =
 \int_0^H
 \left(A+\frac{B-A}{H}z\right)^2
-\,dz.
+\,dz
 $$
 
-
 Expanding and integrating:
-
 
 $$
 V_{\mathrm{frustum}}
@@ -157,10 +148,9 @@ A^2
 2A\frac{B-A}{H}z
 +
 \left(\frac{B-A}{H}\right)^2z^2
-\right]dz,
+\right]
+\,dz
 $$
-
-
 
 $$
 V_{\mathrm{frustum}}
@@ -169,30 +159,37 @@ A^2H
 +
 A(B-A)H
 +
-\frac{(B-A)^2}{3}H.
+\frac{(B-A)^2}{3}H
 $$
 
-
 Collecting terms gives:
-
 
 $$
 V_{\mathrm{frustum}}
 =
 \frac{H}{3}
-\left(A^2+AB+B^2\right).
+\left(
+A^2+AB+B^2
+\right)
 $$
 
+Using the non-dimensional coefficients
 
-Using $a=A/H$ and $b=B/H$:
+$$
+a=\frac{A}{H}
+\qquad
+\text{and}
+\qquad
+b=\frac{B}{H}
+$$
 
+the non-dimensional frustum coefficient becomes:
 
 $$
 \frac{V_{\mathrm{frustum}}}{H^3}
 =
-\frac{a^2+ab+b^2}{3}.
+\frac{a^2+ab+b^2}{3}
 $$
-
 
 This is the gross body used before subtracting the four lateral corner chamfers and the four circular side grooves.
 
@@ -205,72 +202,106 @@ This is the gross body used before subtracting the four lateral corner chamfers 
 
 For Pita, the one-groove area is:
 
-
 $$
-A_g=\frac{1.092465000000-1.024700000000}{4}
+A_g
 =
-0.016941250000.
+\frac{1.092465000000-1.024700000000}{4}
+=
+0.016941250000
 $$
 
-
-With $r=0.121500000000$, this value is obtained by solving:
-
+With
 
 $$
-A_g=r^2\arccos(e/r)-e\sqrt{r^2-e^2},
+r=0.121500000000
 $$
 
+this value is obtained by solving:
+
+$$
+A_g
+=
+r^2\arccos\left(\frac{e}{r}\right)
+-
+e\sqrt{r^2-e^2}
+$$
 
 which gives:
 
-
 $$
-e=0.025906459610,\qquad
-q=0.118705961731,\qquad
-c_{\mathrm{arc}}=0.095593540390.
+e=0.025906459610
 $$
 
+$$
+q=\sqrt{r^2-e^2}=0.118705961731
+$$
+
+$$
+c_{\mathrm{arc}}=r-e=0.095593540390
+$$
 
 For Carvalho, all Pita horizontal plan and groove coefficients are multiplied by:
 
-
 $$
-f=\sqrt{\frac{1.000000000000}{1.024700000000}}
+f
 =
-0.987874174182.
+\sqrt{
+\frac{1.000000000000}{1.024700000000}
+}
+=
+0.987874174182
 $$
 
+Because the vertical reference height remains $H$, the non-dimensional area terms scale with $f^2$, giving:
 
-Because the vertical reference height remains $H$, the non-dimensional area terms scale with $f^2$, giving $K_V=1.000000000000$.
+$$
+K_V=1.000000000000
+$$
 
 ## Dimensional Scaling from Input Weight
 
 The script uses the input unit weight $W$ and concrete unit weight $W_c$ to compute the unit volume:
 
-
 $$
-V=\frac{W}{W_c}.
+V=\frac{W}{W_c}
 $$
-
 
 The selected dimensional convention then gives the reference height:
 
 | Convention | Height relation |
 |---|---:|
-| Pita (1986) | $H=\left(V/1.024700000000\right)^{1/3}$ |
+| Pita (1986) | $H=\left(\dfrac{V}{1.024700000000}\right)^{1/3}$ |
 | Carvalho (2026) | $H=V^{1/3}=D_n$ |
 
-Once $H$ is known, all absolute dimensions are obtained by multiplying the coefficient table values by $H$. For example, $A=aH$, $B=bH$, $D=dH$, $R=rH$ and $E=eH$.
+Once $H$ is known, all absolute dimensions are obtained by multiplying the coefficient table values by $H$. For example:
+
+$$
+A=aH
+$$
+
+$$
+B=bH
+$$
+
+$$
+D=dH
+$$
+
+$$
+R=rH
+$$
+
+$$
+E=eH
+$$
 
 ## Nominal Diameter
 
 The Van der Meer nominal diameter is:
 
-
 $$
-D_n=V^{1/3}.
+D_n=V^{1/3}
 $$
-
 
 The relation between $D_n$ and the drawing height depends on the selected convention:
 
@@ -285,13 +316,11 @@ This distinction is important when hydraulic sizing is expressed through $D_n$ b
 
 A horizontal section has local half-width $h=w/(2H)$, where $w$ is the non-dimensional section width. The east-side groove can be written in local non-dimensional coordinates as:
 
-
 $$
 x(y)=h+e-\sqrt{r^2-y^2},
 \qquad
--q\le y\le q.
+-q\le y\le q
 $$
-
 
 Key points are:
 
@@ -310,26 +339,22 @@ Antifer hydraulic stability is not governed by geometry alone. It depends strong
 
 The Hudson formula remains a common preliminary sizing relation:
 
-
 $$
-W=
+W
+=
 \frac{\gamma_c H_D^3}
-{K_D \Delta^3 \cot\alpha},
+{K_D \Delta^3 \cot\alpha}
 \qquad
-\Delta=\frac{\gamma_c}{\gamma_w}-1.
+\Delta=\frac{\gamma_c}{\gamma_w}-1
 $$
-
 
 The stability number formulation is often more convenient for comparison:
 
-
 $$
-N_s=\frac{H_s}{\Delta D_n}.
+N_s=\frac{H_s}{\Delta D_n}
 $$
-
 
 For regular two-layer cubes and Antifer-calibrated formulae, a Van der Meer-type empirical structure may be used:
-
 
 $$
 N_s
@@ -337,9 +362,8 @@ N_s
 \left(
 k_1\frac{N_{od}^{k_2}}{N_z^{k_3}}+k_4
 \right)
-s_{0m}^{-k_5}.
+s_{0m}^{-k_5}
 $$
-
 
 Typical coefficient sets are:
 
@@ -527,11 +551,11 @@ The geometric definition is necessary for reliable CAD/BIM production, drawing c
 
 ## Dedication
 
-This work is respectfully dedicated to the memory of **Carlos Alberto Roldao Maia Pita** (1950-2002), Portuguese civil engineer and specialist in maritime hydraulics and rubble-mound breakwater design. His LNEC *Memoria n.º 670 - Dimensionamento Hidraulico do Manto Resistente de Quebra-Mares de Talude* remains an important technical reference for Portuguese maritime engineering and provides a key historical basis for the geometric interpretation of Antifer cubes.
+This work is respectfully dedicated to the memory of **Carlos Alberto Roldão Maia Pita** (1950-2002), Portuguese civil engineer and specialist in maritime hydraulics and rubble-mound breakwater design. His LNEC *Memória n.º 670 - Dimensionamento Hidráulico do Manto Resistente de Quebra-Mares de Talude* remains an important technical reference for Portuguese maritime engineering and provides a key historical basis for the geometric interpretation of Antifer cubes.
 
 ## References
 
-1. Pita, C. A. R. M. *Dimensionamento Hidraulico do Manto Resistente de Quebra-Mares de Talude*. Laboratorio Nacional de Engenharia Civil, Memoria n.º 670, Lisboa, 1986.
+1. Pita, C. A. R. M. *Dimensionamento Hidráulico do Manto Resistente de Quebra-Mares de Talude*. Laboratório Nacional de Engenharia Civil, Memória n.º 670, Lisboa, 1986.
 2. BSI. *BS 6349-7:1991 Maritime structures - Part 7: Guide to the design and construction of breakwaters*, with 2010 corrigenda.
 3. CIRIA; CUR; CETMEF. *The Rock Manual: The use of rock in hydraulic engineering*, 2nd ed., 2007.
 4. U.S. Army Corps of Engineers. *Coastal Engineering Manual*. Engineer Manual EM 1110-2-1100, U.S. Army Corps of Engineers, Washington, D.C., 2002.
@@ -539,13 +563,13 @@ This work is respectfully dedicated to the memory of **Carlos Alberto Roldao Mai
 6. Frens, A. B. *The Impact of Placement Method on Antifer-block Stability*. MSc thesis, Delft University of Technology, 2007.
 7. Neves, M. G.; Silva, L. G.; Reither, S. *Stability and overtopping of rubble-mound breakwaters: influence of the placement method and density of cubic blocks*. LNEC / PIANC Portugal.
 8. Chegini, V.; Aghtouman, P. Hydraulic stability formulae for Antifer blocks, 2006.
-9. Freitas, P. M. G. *Hydraulic Stability of Antifer Cubes: Physical Model Study*. MSc dissertation, Instituto Superior Tecnico, 2013.
+9. Freitas, P. M. G. *Hydraulic Stability of Antifer Cubes: Physical Model Study*. MSc dissertation, Instituto Superior Técnico, 2013.
 10. Scaravaglione, G.; Latham, J.-P.; Xiang, J.; Francone, A.; Tomasicchio, G. R. "Historical overview of the structural integrity of Concrete Armour Units", 2022.
 11. Edge, B. L.; Magoon, O. T.; et al. ASCE-ICCE documentation on the rehabilitation of the West Breakwater of Sines and the use of high-density Antifer cubes.
 12. Reis, M. T.; Fortes, C. J. E. M.; Neves, M. G.; et al. "Rehabilitation of Sines west breakwater: wave overtopping study", *Proceedings of the Institution of Civil Engineers - Maritime Engineering*, 2011.
 13. Troch, P.; De Rouck, J.; Van Damme, L. "Full-scale wave-overtopping measurements on the Zeebrugge rubble mound breakwater", *Coastal Engineering*, 2004.
 14. Geeraerts, J.; De Rouck, J.; Troch, P.; et al. "Effects of new variables on the overtopping discharge at steep rubble mound breakwaters: the Zeebrugge prototype case", 2009.
 15. Jensen, O. J. Historical syntheses on the evolution of armour units and recent observations on Antifer behaviour on highly exposed breakwaters.
-16. Luis, L.; Freire, S.; Barros, J.; Lopes, H.; Lemos, R.; Fortes, C.; Neves, G. "Estudos e projetos do prolongamento do quebra-mar exterior e das acessibilidades maritimas do Porto de Leixoes", PIANC Portugal / LNEC, 2022.
-17. Teixeira Duarte. "Extension of the Outer Breakwater and Maritime Access Ways of Leixoes Port", project description with Antifer block quantities and classes.
-18. Portos dos Acores / NRV-Norvia / PORTUS. Documentation on the emergency protection and reconstruction of the Port of Lajes das Flores after Hurricane Lorenzo and subsequent storm damage.
+16. Luís, L.; Freire, S.; Barros, J.; Lopes, H.; Lemos, R.; Fortes, C.; Neves, G. "Estudos e projetos do prolongamento do quebra-mar exterior e das acessibilidades marítimas do Porto de Leixões", PIANC Portugal / LNEC, 2022.
+17. Teixeira Duarte. "Extension of the Outer Breakwater and Maritime Access Ways of Leixões Port", project description with Antifer block quantities and classes.
+18. Portos dos Açores / NRV-Norvia / PORTUS. Documentation on the emergency protection and reconstruction of the Port of Lajes das Flores after Hurricane Lorenzo and subsequent storm damage.
