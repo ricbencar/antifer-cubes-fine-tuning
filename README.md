@@ -8,10 +8,14 @@ This repository contains a Python production tool that generates a closed vector
 
 Two dimensional conventions are implemented.
 
-| Convention | Purpose | Volume relation | Reference-height meaning |
-|---|---|---:|---|
-| Pita (1986) | historical proportional Antifer reference | $V/H^3=1.024700000000$ | drawing height used in the historical coefficient set |
-| Carvalho (2026) | volume-normalised CAD/BIM reference | $V/H^3=1.000000000000$ | $H=D_n=V^{1/3}$ |
+| Convention | Volume relation |
+|---|---:|
+| Pita (1986) | $V/H^3=1.024700000000$ |
+| Carvalho (2026) | $V/H^3=1.000000000000$ |
+
+**Pita (1986).** Purpose: historical proportional Antifer reference. Reference-height meaning: drawing height used in the historical coefficient set.
+
+**Carvalho (2026).** Purpose: volume-normalised CAD/BIM reference. Reference-height meaning: $H=D_n=V^{1/3}$.
 
 The same vectorial topology is used in both conventions: a tapered body, no top bevel, four lateral plan chamfers and four single circular-arc side grooves. The Carvalho convention is obtained by horizontally normalising the Pita plan and groove coefficients by a common factor so that the final non-dimensional volume coefficient becomes unity.
 
@@ -40,13 +44,15 @@ Representative contexts in which Antifer units have been used or studied include
 | Case | Main relevance |
 |---|---|
 | Port of Antifer | origin and prototype context |
-| Sines West Breakwater | repair and rehabilitation after Dolos armour-layer failure |
-| Zeebrugge | prototype overtopping and run-up measurements |
-| Douro Bar / Cabedelo do Douro | model testing, high-density units and monitoring |
-| Leixoes Outer Breakwater | contemporary Portuguese port-extension use |
-| Lajes das Flores | Atlantic island-port emergency protection and reconstruction |
-| Mohammedia | severe-exposure international breakwater context |
-| Brunei | documented manufacture, curing and placement practice |
+| Sines West Breakwater | post-Dolos failure rehabilitation |
+| Zeebrugge | prototype overtopping and run-up |
+| Douro Bar / Cabedelo do Douro | tests, high-density units, monitoring |
+| Leixoes Outer Breakwater | contemporary Portuguese port extension |
+| Lajes das Flores | Atlantic island emergency/reconstruction |
+| Mohammedia | international severe-exposure context |
+| Brunei | manufacture, curing and placement |
+
+At Sines, this concerns repair and rehabilitation after Dolos armour-layer failure. Zeebrugge provides prototype measurements; Douro includes model testing. Lajes das Flores concerns island-port emergency protection and reconstruction. The Brunei case documents manufacture, curing and placement practice.
 
 These examples are engineering context only. They do not define a universal stability coefficient.
 
@@ -67,24 +73,40 @@ These examples are engineering context only. They do not define a universal stab
 | Groove centre offset | $E$, with $e=E/H$, outside the side face |
 | Generated groove depth | $C_{\mathrm{arc}}=R-E$; $c_{\mathrm{arc}}=r-e$ |
 | Groove half-opening | $Q=\sqrt{R^2-E^2}$; $q=Q/H=\sqrt{r^2-e^2}$ |
-| Geometry source | pure vectorial B-rep generation; no imported template geometry |
+
+**Geometry source:** pure vectorial B-rep generation; no imported template geometry.
 
 ### Master Coefficient Table
 
 All Pita and Carvalho coefficients used by the production script are consolidated here. Later sections refer back to this table instead of repeating the same coefficient set.
 
-| Quantity | Meaning | Pita (1986) | Carvalho (2026) |
-|---|---|---:|---:|
-| $K_V$ | final volume coefficient, $V/H^3$ | 1.024700000000 | 1.000000000000 |
-| $f$ | horizontal factor applied to Pita coefficients | 1.000000000000 | 0.987874174182 |
-| $a=A/H$ | bottom width coefficient | 1.086000000000 | 1.072831353161 |
-| $b=B/H$ | top width coefficient | 1.005000000000 | 0.992813545052 |
-| $d=D/H$ | lateral chamfer coefficient | 0.024000000000 | 0.023708980180 |
-| $r=R/H$ | groove-radius coefficient | 0.121500000000 | 0.120026712163 |
-| $e=E/H$ | outside groove-centre offset | 0.025906459610 | 0.025592322393 |
-| $c_{\mathrm{arc}}=r-e$ | generated circular-arc groove-depth coefficient | 0.095593540390 | 0.094434389770 |
-| $q=\sqrt{r^2-e^2}$ | groove half-opening coefficient | 0.118705961731 | 0.117266553915 |
-| $2q$ | full groove-opening coefficient | 0.237411923462 | 0.234533107831 |
+| Quantity | Pita (1986) | Carvalho (2026) |
+|---|---:|---:|
+| $K_V$ | 1.024700000000 | 1.000000000000 |
+| $f$ | 1.000000000000 | 0.987874174182 |
+| $a=A/H$ | 1.086000000000 | 1.072831353161 |
+| $b=B/H$ | 1.005000000000 | 0.992813545052 |
+| $d=D/H$ | 0.024000000000 | 0.023708980180 |
+| $r=R/H$ | 0.121500000000 | 0.120026712163 |
+| $e=E/H$ | 0.025906459610 | 0.025592322393 |
+| $c_{\mathrm{arc}}=r-e$ | 0.095593540390 | 0.094434389770 |
+| $q=\sqrt{r^2-e^2}$ | 0.118705961731 | 0.117266553915 |
+| $2q$ | 0.237411923462 | 0.234533107831 |
+
+Coefficient definitions:
+
+| Quantity | Meaning |
+|---|---|
+| $K_V$ | final volume coefficient, $V/H^3$ |
+| $f$ | horizontal factor applied to Pita coefficients |
+| $a=A/H$ | bottom width coefficient |
+| $b=B/H$ | top width coefficient |
+| $d=D/H$ | lateral chamfer coefficient |
+| $r=R/H$ | groove-radius coefficient |
+| $e=E/H$ | outside groove-centre offset |
+| $c_{\mathrm{arc}}=r-e$ | generated circular-arc groove-depth coefficient |
+| $q=\sqrt{r^2-e^2}$ | groove half-opening coefficient |
+| $2q$ | full groove-opening coefficient |
 
 The historical Pita notation often reports $C/H=0.095600$. The production geometry uses the volume-consistent circular-arc value $c_{\mathrm{arc}}=0.095593540390$, which is the generated depth obtained from $C_{\mathrm{arc}}=R-E$.
 
@@ -92,132 +114,80 @@ The historical Pita notation often reports $C/H=0.095600$. The production geomet
 
 The generated unit volume is computed from a simple geometric balance.
 
-$$
-\frac{V}{H^3}=K_{\mathrm{frustum}}-K_{\mathrm{chamfers}}-K_{\mathrm{grooves}}
-$$
+$$ \frac{V}{H^3}=K_{\mathrm{frustum}}-K_{\mathrm{chamfers}}-K_{\mathrm{grooves}} $$
 
 The components are:
 
-| Component | Non-dimensional expression | Meaning |
-|---|---|---|
-| Gross tapered square frustum | $K_{\mathrm{frustum}}=(a^2+ab+b^2)/3$ | volume before groove and chamfer removals |
-| Four corner chamfers | $K_{\mathrm{chamfers}}=2d^2$ | four triangular plan removals carried through the height |
-| One circular groove | $A_g=r^2\arccos(e/r)-e\sqrt{r^2-e^2}$ | circular-segment area removed by one side groove |
-| Four side grooves | $K_{\mathrm{grooves}}=4A_g$ | total groove subtraction |
-| Final coefficient | $K_V=K_{\mathrm{frustum}}-K_{\mathrm{chamfers}}-K_{\mathrm{grooves}}$ | final value of $V/H^3$ |
+| Component | Non-dimensional expression |
+|---|---|
+| Gross tapered square frustum | $K_{\mathrm{frustum}}=(a^2+ab+b^2)/3$ |
+| Four corner chamfers | $K_{\mathrm{chamfers}}=2d^2$ |
+| One circular groove | $A_g=r^2\arccos(e/r)-e\sqrt{r^2-e^2}$ |
+| Four side grooves | $K_{\mathrm{grooves}}=4A_g$ |
+| Final coefficient | $K_V=K_{\mathrm{frustum}}-K_{\mathrm{chamfers}}-K_{\mathrm{grooves}}$ |
+
+Component meanings:
+
+- **Gross tapered square frustum:** volume before groove and chamfer removals.
+- **Four corner chamfers:** four triangular plan removals carried through the height.
+- **One circular groove:** circular-segment area removed by one side groove.
+- **Four side grooves:** total groove subtraction.
+- **Final coefficient:** final value of $V/H^3$.
 
 ### Demonstration of the Square-Frustum Formula
 
 Let a square frustum have height $H$, lower width $A$ and upper width $B$. At a vertical coordinate $z$, measured from the bottom, the linearly interpolated side length is:
 
-
-$$
-s(z)=A+\frac{B-A}{H}z.
-$$
-
+$$ s(z)=A+\frac{B-A}{H}z. $$
 
 The horizontal area at level $z$ is:
 
-
-$$
-S(z)=s(z)^2.
-$$
-
+$$ S(z)=s(z)^2. $$
 
 The frustum volume is therefore:
 
-
-$$
-V_{\mathrm{frustum}}
-=
-\int_0^H
-\left(A+\frac{B-A}{H}z\right)^2
-\,dz.
-$$
-
+$$ V_{\mathrm{frustum}} = \int_0^H \left(A+\frac{B-A}{H}z\right)^2 \,dz. $$
 
 Expanding and integrating:
 
+$$ V_{\mathrm{frustum}} = \int_0^H \left[ A^2 + 2A\frac{B-A}{H}z + \left(\frac{B-A}{H}\right)^2z^2 \right]dz, $$
 
-$$
-V_{\mathrm{frustum}}
-=
-\int_0^H
-\left[
-A^2
-+
-2A\frac{B-A}{H}z
-+
-\left(\frac{B-A}{H}\right)^2z^2
-\right]dz,
-$$
-
-
-
-$$
-V_{\mathrm{frustum}}
-=
-A^2H
-+
-A(B-A)H
-+
-\frac{(B-A)^2}{3}H.
-$$
-
+$$ V_{\mathrm{frustum}} = A^2H + A(B-A)H + \frac{(B-A)^2}{3}H. $$
 
 Collecting terms gives:
 
-
-$$
-V_{\mathrm{frustum}}
-=
-\frac{H}{3}
-\left(A^2+AB+B^2\right).
-$$
-
+$$ V_{\mathrm{frustum}} = \frac{H}{3} \left(A^2+AB+B^2\right). $$
 
 Using $a=A/H$ and $b=B/H$:
 
-
-$$
-\frac{V_{\mathrm{frustum}}}{H^3}
-=
-\frac{a^2+ab+b^2}{3}.
-$$
-
+$$ \frac{V_{\mathrm{frustum}}}{H^3} = \frac{a^2+ab+b^2}{3}. $$
 
 This is the gross body used before subtracting the four lateral corner chamfers and the four circular side grooves.
 
 ### Compact Numerical Balance
 
-| Convention | Gross frustum | Chamfers | Grooves | Final $V/H^3$ |
-|---|---:|---:|---:|---:|
-| Pita (1986) | 1.093617000000 | 0.001152000000 | 0.067765000000 | 1.024700000000 |
-| Carvalho (2026) | 1.067255782180 | 0.001124231482 | 0.066131550698 | 1.000000000000 |
+| Component | Pita (1986) | Carvalho (2026) |
+|---|---:|---:|
+| Gross frustum | 1.093617000000 | 1.067255782180 |
+| Chamfers | 0.001152000000 | 0.001124231482 |
+| Grooves | 0.067765000000 | 0.066131550698 |
+| Final $V/H^3$ | 1.024700000000 | 1.000000000000 |
 
 For Pita, the one-groove area is:
 
-$$
-A_g=\frac{1.092465000000-1.024700000000}{4}=0.016941250000
-$$
+$$ A_g=\frac{1.092465000000-1.024700000000}{4}=0.016941250000 $$
 
 With r = 0.121500000000, this value is obtained by solving:
 
-$$
-A_g=r^2\arccos\left(\frac{e}{r}\right)-e\sqrt{r^2-e^2}
-$$
+$$ A_g=r^2\arccos\left(\frac{e}{r}\right)-e\sqrt{r^2-e^2} $$
 
 which gives:
 
-$$
-e=0.025906459610,\qquad q=0.118705961731,\qquad c_{\mathrm{arc}}=0.095593540390
-$$
+$$ e=0.025906459610,\qquad q=0.118705961731,\qquad c_{\mathrm{arc}}=0.095593540390 $$
 
 For Carvalho, all Pita horizontal plan and groove coefficients are multiplied by:
 
-$$
-f=\sqrt{\frac{1.000000000000}{1.024700000000}}=0.987874174182
-$$
+$$ f=\sqrt{\frac{1.000000000000}{1.024700000000}}=0.987874174182 $$
 
 Because the vertical reference height remains $H$, the non-dimensional area terms scale with $f^2$, giving $K_V=1.000000000000$.
 
@@ -225,9 +195,7 @@ Because the vertical reference height remains $H$, the non-dimensional area term
 
 The script uses the input unit weight $W$ and concrete unit weight $W_c$ to compute the unit volume:
 
-$$
-V=\frac{W}{W_c}
-$$
+$$ V=\frac{W}{W_c} $$
 
 The selected dimensional convention then gives the reference height:
 
@@ -242,9 +210,7 @@ Once $H$ is known, all absolute dimensions are obtained by multiplying the coeff
 
 The Van der Meer nominal diameter is:
 
-$$
-D_n=V^{1/3}
-$$
+$$ D_n=V^{1/3} $$
 
 The relation between $D_n$ and the drawing height depends on the selected convention:
 
@@ -259,9 +225,7 @@ This distinction is important when hydraulic sizing is expressed through $D_n$ b
 
 A horizontal section has local half-width $h=w/(2H)$, where $w$ is the non-dimensional section width. The east-side groove can be written in local non-dimensional coordinates as:
 
-$$
-x(y)=h+e-\sqrt{r^2-y^2},\qquad -q\le y\le q
-$$
+$$ x(y)=h+e-\sqrt{r^2-y^2},\qquad -q\le y\le q $$
 
 Key points are:
 
@@ -280,31 +244,24 @@ Antifer hydraulic stability is not governed by geometry alone. It depends strong
 
 The Hudson formula remains a common preliminary sizing relation:
 
-$$
-W=\frac{\gamma_c H_D^3}{K_D\Delta^3\cot\alpha},\qquad
-\Delta=\frac{\gamma_c}{\gamma_w}-1
-$$
+$$ W=\frac{\gamma_c H_D^3}{K_D\Delta^3\cot\alpha},\qquad \Delta=\frac{\gamma_c}{\gamma_w}-1 $$
 
 The stability number formulation is often more convenient for comparison:
 
-$$
-N_s=\frac{H_s}{\Delta D_n}
-$$
+$$ N_s=\frac{H_s}{\Delta D_n} $$
 
 For regular two-layer cubes and Antifer-calibrated formulae, a Van der Meer-type empirical structure may be used:
 
-$$
-N_s=\left(k_1\frac{N_{od}^{k_2}}{N_z^{k_3}}+k_4\right)s_{0m}^{-k_5}
-$$
+$$ N_s=\left(k_1\frac{N_{od}^{k_2}}{N_z^{k_3}}+k_4\right)s_{0m}^{-k_5} $$
 
 Typical coefficient sets are:
 
 | Armour unit and slope | $k_1$ | $k_2$ | $k_3$ | $k_4$ | $k_5$ |
 |---|---:|---:|---:|---:|---:|
-| Regular cube, cot α = 1.5 | 6.700 | 0.400 | 0.300 | 1.000 | 0.100 |
-| Regular cube, cot α = 2.0 | 7.374 | 0.400 | 0.300 | 1.101 | 0.100 |
-| Antifer, cot α = 1.5 | 6.951 | 0.443 | 0.291 | 1.082 | 0.082 |
-| Antifer, cot α = 2.0 | 6.138 | 0.443 | 0.276 | 1.164 | 0.070 |
+| Regular cube, $\cot\alpha=1.5$ | 6.700 | 0.400 | 0.300 | 1.000 | 0.100 |
+| Regular cube, $\cot\alpha=2.0$ | 7.374 | 0.400 | 0.300 | 1.101 | 0.100 |
+| Antifer, $\cot\alpha=1.5$ | 6.951 | 0.443 | 0.291 | 1.082 | 0.082 |
+| Antifer, $\cot\alpha=2.0$ | 6.138 | 0.443 | 0.276 | 1.164 | 0.070 |
 
 These formulae are preliminary design tools, not substitutes for project-specific verification. Reported $K_D$ values for Antifer vary widely because placement method and damage definition dominate the result.
 
@@ -312,24 +269,31 @@ These formulae are preliminary design tools, not substitutes for project-specifi
 
 The same Antifer geometry can perform differently depending on armour-layer architecture.
 
-| Placement tendency | Main benefit | Main risk |
-|---|---|---|
-| regular placement | higher displacement stability | greater reflection and overtopping in some cases |
-| irregular placement | greater roughness and reduced overtopping | lower displacement stability |
-| dense packing | higher contact restraint | reduced porosity and possible paving behaviour |
-| open packing | higher porosity and roughness | greater movement risk |
+| Placement tendency | Main benefit |
+|---|---|
+| regular placement | higher displacement stability |
+| irregular placement | greater roughness and reduced overtopping |
+| dense packing | higher contact restraint |
+| open packing | higher porosity and roughness |
+
+| Placement tendency | Main risk |
+|---|---|
+| regular placement | greater reflection and overtopping in some cases |
+| irregular placement | lower displacement stability |
+| dense packing | reduced porosity and possible paving behaviour |
+| open packing | greater movement risk |
 
 Relevant failure and degradation mechanisms include:
 
 | Mechanism | Description |
 |---|---|
-| rocking | repeated angular movement without extraction |
-| displacement | block moves out of its stable position |
-| chain failure | movement of one block destabilises adjacent units |
-| smoothing or paving | armour surface becomes more regular and less rough |
-| concrete cracking | thermal, shrinkage, handling, impact or fatigue damage |
-| toe or underlayer failure | loss of support leading to progressive armour instability |
-| overtopping-induced rear damage | crest or rear-side damage due to transmitted water |
+| rocking | repeated angular motion; no extraction |
+| displacement | block leaves its stable position |
+| chain failure | block movement destabilises adjacent units |
+| smoothing or paving | more regular, less rough armour surface |
+| concrete cracking | thermal, shrinkage, handling, impact or fatigue |
+| toe or underlayer failure | support loss; progressive armour instability |
+| overtopping rear damage | transmitted water damages crest or rear side |
 
 A defensible Antifer design must therefore consider the full armour system, not only the isolated concrete unit.
 
@@ -339,15 +303,17 @@ Antifer units are normally manufactured as plain unreinforced concrete blocks. T
 
 | Aspect | Typical practice or control |
 |---|---|
-| Concrete | normally unreinforced; low heat of hydration recommended |
+| Concrete | normally unreinforced; low hydration heat |
 | Strength class | commonly C25/30 in manual-type references |
-| Formwork | four-face mould, open top and bottom in typical production |
+| Formwork | four-face mould; typically open top and bottom |
 | Casting | top casting with vibration |
 | Curing | prolonged moist curing, especially for large units |
 | Handling | controlled lifting, rotation and storage procedures |
 | Mass control | verify W = Wc V |
 | Dimensional control | verify mould dimensions and generated volume |
-| Rejection logic | reject significant cracks, honeycombing, cold joints or excessive corner loss |
+| Rejection logic | reject the defects listed below |
+
+Low heat of hydration is recommended. Reject units with significant cracks, honeycombing, cold joints or excessive corner loss.
 
 A dimensional error is a stability error. A density error is also a stability error. For CAD/BIM production, a volume error in the digital solid becomes a procurement, fabrication and quality-control error.
 
@@ -441,7 +407,8 @@ All exported geometry is dimensional and written in metres. The exported XY orig
 A PyInstaller spec file is recommended for repeatable Windows production builds:
 
 ```powershell
-pyi-makespec --onefile --windowed --name script --collect-all ezdxf script_final_production.py
+pyi-makespec --onefile --windowed --name script `
+  --collect-all ezdxf script_final_production.py
 pyinstaller --clean --noconfirm script.spec
 ```
 
@@ -460,7 +427,7 @@ Before issuing geometry for technical use, check:
 | closed shell | every B-rep edge shared by exactly two faces |
 | volume | generated volume matches the selected $K_V$ |
 | IFC/STL/OBJ/DXF | all formats generated from the same B-rep source |
-| output report | dimensions and validation values recorded in `output.txt` |
+| output report | dimensions and validation values in `output.txt` |
 
 ## Limitations
 
