@@ -483,7 +483,7 @@ The geometric definition is necessary for reliable CAD/BIM production, drawing c
 
 ## Dedication
 
-This work is respectfully dedicated to the memory of **Carlos Alberto Roldao Maia Pita** (1950-2002), Portuguese civil engineer and specialist in maritime hydraulics and rubble-mound breakwater design. His LNEC *Memoria n.º 670 - Dimensionamento Hidraulico do Manto Resistente de Quebra-Mares de Talude* remains an important technical reference for Portuguese maritime engineering and provides a key historical basis for the geometric interpretation of Antifer cubes.
+This work is respectfully dedicated to the memory of **Carlos Alberto Roldão Maia Pita** (1950-2002), Portuguese civil engineer and specialist in maritime hydraulics and rubble-mound breakwater design. His LNEC *Memória n.º 670 — Dimensionamento Hidráulico do Manto Resistente de Quebra-Mares de Talude* remains an important technical reference for Portuguese maritime engineering and provides a key historical basis for the geometric interpretation of Antifer cubes.
 
 ## References
 
