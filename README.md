@@ -374,7 +374,7 @@ python script_final_production.py
 Typical workflow:
 
 1. Enter the Antifer unit weight $W$ in kN.
-2. Enter the concrete unit weight $W_c$ in kN/m$^3$.
+2. Enter the concrete unit weight $W_c$ in kN/m3.
 3. Select Pita (1986) or Carvalho (2026).
 4. Select the output folder.
 5. Review the calculation and validation preview.
