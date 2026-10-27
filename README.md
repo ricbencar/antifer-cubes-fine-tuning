@@ -10,12 +10,12 @@ Two dimensional conventions are implemented.
 
 | Convention | Volume relation |
 |---|---:|
-| Pita (1986) | $V/H^3=1.024700000000$ |
-| Carvalho (2026) | $V/H^3=1.000000000000$ |
+| Pita (1986) | $V/H^3=1.0247$ |
+| Carvalho (2026) | $V/H^3=1$ |
 
 **Pita (1986).** Purpose: historical proportional Antifer reference. Reference-height meaning: drawing height used in the historical coefficient set.
 
-**Carvalho (2026).** Purpose: volume-normalised CAD/BIM reference. Reference-height meaning: $H=D_n=V^{1/3}$.
+**Carvalho (2026).** Purpose: volume-normalised CAD/BIM reference. Reference-height meaning: $H=D_n=H=V^{1/3}$.
 
 The same vectorial topology is used in both conventions: a tapered body, no top bevel, four lateral plan chamfers and four single circular-arc side grooves. The Carvalho convention is obtained by horizontally normalising the Pita plan and groove coefficients by a common factor so that the final non-dimensional volume coefficient becomes unity.
 
@@ -82,12 +82,12 @@ All Pita and Carvalho coefficients used by the production script are consolidate
 
 | Quantity | Pita (1986) | Carvalho (2026) |
 |---|---:|---:|
-| $K_V$ | 1.024700000000 | 1.000000000000 |
-| $f$ | 1.000000000000 | 0.987874174182 |
-| $a=A/H$ | 1.086000000000 | 1.072831353161 |
-| $b=B/H$ | 1.005000000000 | 0.992813545052 |
-| $d=D/H$ | 0.024000000000 | 0.023708980180 |
-| $r=R/H$ | 0.121500000000 | 0.120026712163 |
+| $K_V$ | 1.0247 | 1 |
+| $f$ | 1 | 0.987874174182 |
+| $a=A/H$ | 1.0860 | 1.072831353161 |
+| $b=B/H$ | 1.0050 | 0.992813545052 |
+| $d=D/H$ | 0.0240 | 0.023708980180 |
+| $r=R/H$ | 0.1215 | 0.120026712163 |
 | $e=E/H$ | 0.025906459610 | 0.025592322393 |
 | $c_{\mathrm{arc}}=r-e$ | 0.095593540390 | 0.094434389770 |
 | $q=\sqrt{r^2-e^2}$ | 0.118705961731 | 0.117266553915 |
@@ -108,7 +108,7 @@ Coefficient definitions:
 | $q=\sqrt{r^2-e^2}$ | groove half-opening coefficient |
 | $2q$ | full groove-opening coefficient |
 
-The historical Pita notation often reports $C/H=0.095600$. The production geometry uses the volume-consistent circular-arc value $c_{\mathrm{arc}}=0.095593540390$, which is the generated depth obtained from $C_{\mathrm{arc}}=R-E$.
+The historical Pita notation often reports $C/H=0.0956$. The production geometry uses the volume-consistent circular-arc value $c_{\mathrm{arc}}=0.09559354039$, which is the generated depth obtained from $C_{\mathrm{arc}}=R-E$.
 
 ## Algebraic Volume Definition
 
@@ -168,28 +168,28 @@ This is the gross body used before subtracting the four lateral corner chamfers 
 
 | Component | Pita (1986) | Carvalho (2026) |
 |---|---:|---:|
-| Gross frustum | 1.093617000000 | 1.067255782180 |
-| Chamfers | 0.001152000000 | 0.001124231482 |
-| Grooves | 0.067765000000 | 0.066131550698 |
-| Final $V/H^3$ | 1.024700000000 | 1.000000000000 |
+| Gross frustum | 1.093617 | 1.067255782180 |
+| Chamfers | 0.001152 | 0.001124231482 |
+| Grooves | 0.067765 | 0.066131550698 |
+| Final $V/H^3$ | 1.0247 | 1 |
 
 For Pita, the one-groove area is:
 
-$$ A_g=\frac{1.092465000000-1.024700000000}{4}=0.016941250000 $$
+$$ A_g=\frac{1.092465-1.0247}{4}=0.01694125 $$
 
-With r = 0.121500000000, this value is obtained by solving:
+With r = 0.1215, this value is obtained by solving:
 
 $$ A_g=r^2\arccos\left(\frac{e}{r}\right)-e\sqrt{r^2-e^2} $$
 
 which gives:
 
-$$ e=0.025906459610,\qquad q=0.118705961731,\qquad c_{\mathrm{arc}}=0.095593540390 $$
+$$ e=0.02590645961,\qquad q=0.118705961731,\qquad c_{\mathrm{arc}}=0.09559354039 $$
 
 For Carvalho, all Pita horizontal plan and groove coefficients are multiplied by:
 
-$$ f=\sqrt{\frac{1.000000000000}{1.024700000000}}=0.987874174182 $$
+$$ f=\sqrt{\frac{1}{1.0247}}=0.987874174182 $$
 
-Because the vertical reference height remains $H$, the non-dimensional area terms scale with $f^2$, giving $K_V=1.000000000000$.
+Because the vertical reference height remains $H$, the non-dimensional area terms scale with $f^2$, giving $K_V=1$.
 
 ## Dimensional Scaling from Input Weight
 
@@ -201,7 +201,7 @@ The selected dimensional convention then gives the reference height:
 
 | Convention | Height relation |
 |---|---|
-| Pita (1986) | $H=(V/1.024700000000)^{1/3}$ |
+| Pita (1986) | $H=(V/1.0247)^{1/3}$ |
 | Carvalho (2026) | $H=V^{1/3}=D_n$ |
 
 Once $H$ is known, all absolute dimensions are obtained by multiplying the coefficient table values by $H$. For example, $A=aH$, $B=bH$, $D=dH$, $R=rH$ and $E=eH$.
@@ -216,8 +216,8 @@ The relation between $D_n$ and the drawing height depends on the selected conven
 
 | Convention | Relation |
 |---|---|
-| Pita (1986) | $D_n=(1.024700000000)^{1/3}H=1.008166460709H$ |
-| Carvalho (2026) | $D_n=H$ |
+| Pita (1986) | $D_n=(1.0247)^{1/3}H=1.008166460709H$ |
+| Carvalho (2026) | $D_n=H=V^{1/3}$ |
 
 This distinction is important when hydraulic sizing is expressed through $D_n$ but CAD geometry is generated through a drawing height $H$.
 
@@ -444,7 +444,7 @@ Critical works should be verified through physical modelling or equivalent proje
 
 ## Conclusions
 
-The production geometry is a reproducible algebraic reconstruction of an Antifer cube as a square frustum with four lateral plan chamfers and four circular side grooves. Pita preserves the historical volume coefficient $V/H^3=1.024700000000$. Carvalho keeps the same topology but horizontally normalises the plan and groove coefficients so that $V/H^3=1.000000000000$ and $H=D_n$.
+The production geometry is a reproducible algebraic reconstruction of an Antifer cube as a square frustum with four lateral plan chamfers and four circular side grooves. Pita preserves the historical volume coefficient $V/H^3=1.0247$. Carvalho keeps the same topology but horizontally normalises the plan and groove coefficients so that $V/H^3=1$ and $H=D_n$.
 
 The geometric definition is necessary for reliable CAD/BIM production, drawing control, volume calculation and quality assurance. It does not remove the need for hydraulic verification. Antifer stability remains governed primarily by armour-layer placement, packing density, wave climate, slope, storm duration, toe support, construction tolerance and accepted damage.
 
