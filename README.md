@@ -15,7 +15,7 @@ Two dimensional conventions are implemented.
 
 **Pita (1986).** Purpose: historical proportional Antifer reference. Reference-height meaning: drawing height used in the historical coefficient set.
 
-**Carvalho (2026).** Purpose: volume-normalised CAD/BIM reference. Reference-height meaning: $H=D_n=H=V^{1/3}$.
+**Carvalho (2026).** Purpose: volume-normalised CAD/BIM reference. Reference-height meaning: $H=D_n=V^{1/3}$.
 
 The same vectorial topology is used in both conventions: a tapered body, no top bevel, four lateral plan chamfers and four single circular-arc side grooves. The Carvalho convention is obtained by horizontally normalising the Pita plan and groove coefficients by a common factor so that the final non-dimensional volume coefficient becomes unity.
 
